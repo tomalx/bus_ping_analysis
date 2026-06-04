@@ -47,3 +47,13 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+
+########
+csv/bus_loc_*.csv
+rds/bod*.rds
+parquet/
+
+
+
+
+
