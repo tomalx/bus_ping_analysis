@@ -1,5 +1,8 @@
 ## to_parquet_store
 
+library(arrow)
+library(tidyverse)
+
 bus_loc_csv <- dir(path = "csv/", pattern = ".csv", full.names = TRUE)
 bus_loc_csv <- map(bus_loc_csv[9:10],read.csv)
 library(purrr)
@@ -33,3 +36,5 @@ tibble(
   files = list.files("parquet", recursive = TRUE),
   size_MB = file.size(file.path("parquet", files)) / 1024^2
 )
+
+

@@ -1,0 +1,29 @@
+### 2 ### shape and tidy bod_day
+#### filter to remove extra heading rows
+#### time in jny var
+#### (filter for just one route/direction)
+
+# ticket_machine_service_code <- "7"  ## for testing only - set this var in run_gps_snapper.R
+
+tic(msg="filter to remove headings rows and mutate route_destination")
+bod_eg <- bod_loc_query %>% 
+  filter(!lineRef == "lineRef") %>%
+  mutate(route_destination = paste0(lineRef,"-",destination)) %>%
+  mutate(route_destination = word(route_destination,1, sep = "__"))
+toc()
+
+# filter for e.g. m1 inbound
+bod_eg1 <- bod_eg %>% 
+  #filter(ticketMachineServiceCode == "U1" & directionRef == direction) %>%
+  #filter(journeyCode == "0630") %>% 
+  st_as_sf(coords = c("lng","lat"), crs = 4326) %>% 
+  mutate(journeyCode = as.factor(journeyCode))
+
+
+# create time in jny var, time_trip
+bod_eg1 <- bod_eg1 %>% 
+  mutate(time = ymd_hms(time)) %>% 
+  group_by(journeyCode) %>% 
+  # normalise time to start of journey
+  mutate(time_trip = time - min(time)) %>% 
+  ungroup()
