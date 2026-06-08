@@ -14,6 +14,8 @@
 ## parquet store group_by - should not use originAimedDepartureTime because this
 ## field is missing from some records.
 
+library(arrow)
+library(dplyr)
 
 parquet_path <- "parquet"
 
