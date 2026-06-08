@@ -24,8 +24,8 @@ bus_loc_parquet <- open_dataset(parquet_path)
 
 
 bod_loc_query <- bus_loc_parquet %>% 
-  filter(year_month == "NANA") %>% 
-  filter(lineRef == "U1") #%>% 
+  filter(year_month == "20266") %>% 
+  filter(lineRef == "1") #%>% 
  # group_by(time,destination,journeyCode) %>% 
   #summarise(count = n())
 #group_by(lineRef, journeyCode, destination) %>% 

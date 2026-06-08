@@ -17,8 +17,14 @@ bod_eg <- bod_loc_query %>%
   mutate(route_destination = word(route_destination,1, sep = "__"))
 toc()
 
+# filter services that have same route number (6 in Bath, 6 in Bristol etc)
+bod_eg$ticketMachineServiceCode %>% unique()
+unique_service_code <- bod_eg$ticketMachineServiceCode %>% unique() 
+unique_service_code <- unique_service_code[1] 
+
 # filter for e.g. m1 inbound
-bod_eg1 <- bod_eg %>% 
+bod_eg1 <- bod_eg %>%
+  filter(ticketMachineServiceCode %in% unique_service_code) %>% 
   #filter(ticketMachineServiceCode == "U1" & directionRef == direction) %>%
   #filter(journeyCode == "0630") %>% 
   st_as_sf(coords = c("lng","lat"), crs = 4326) %>% 
