@@ -5,6 +5,11 @@
 
 # ticket_machine_service_code <- "7"  ## for testing only - set this var in run_gps_snapper.R
 
+library(stringr)
+library(tictoc)
+library(sf)
+library(lubridate)
+
 tic(msg="filter to remove headings rows and mutate route_destination")
 bod_eg <- bod_loc_query %>% 
   filter(!lineRef == "lineRef") %>%
