@@ -1,5 +1,5 @@
 #### leaflet map ####
-
+library(leaflet)
 
 
 map <-  leaflet::leaflet() %>%
@@ -29,10 +29,13 @@ map <- map %>% addPolylines(data = nearest_lines,
                             group = "nearest lines")
 
 map <- map %>% addCircles(data = bod_eg1,
-                          radius = 0.5,
+                          radius = 0.8,
                           weight = 0.3,
                           color = "black",
                           fillOpacity = 0,
+                          popup = ~paste0(time, "<br>", 
+                                          directionRef, "<br>",
+                                          ),
                           group = "original points")
 
 map  %>% addLayersControl(baseGroups = c("OSM", "carto"),
