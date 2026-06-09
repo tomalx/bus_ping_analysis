@@ -38,4 +38,13 @@ stop_seq <- stop_seq %>% left_join(gtfs_sf$routes %>%
                                             route_long_name))
 
 
+###
 
+unq_long_name <- stop_seq_trip_lookup_all_stops$route_long_name %>% unique
+unq_long_name
+unq_long_name <- unq_long_name[2]
+
+stop_seq_trip_lookup_all_stops <- stop_seq_trip_lookup_all_stops %>% 
+  filter(route_long_name == unq_long_name)
+unq_route_id <- stop_seq_trip_lookup_all_stops$route_id %>% unique()
+bus_stats <- bus_stats %>% filter(route_id %in% unq_route_id)
