@@ -11,20 +11,25 @@
 ## To Do - store as parquet and use arrow to read data
 ## https://r4ds.hadley.nz/arrow.html
 
+## method for importing multiple days
+
 ## parquet store group_by - should not use originAimedDepartureTime because this
 ## field is missing from some records.
 
 library(arrow)
 library(dplyr)
+library(glue)
+
+parquet_month_dir <- "20266" # YYYYM / YYYYMM
 
 parquet_path <- "parquet"
 
 
-bus_loc_parquet <- open_dataset(parquet_path)
+bus_loc_parquet <- open_dataset(glue("parquet/{parquet_month_dir}"))
 
 
 bod_loc_query <- bus_loc_parquet %>% 
-  filter(year_month == "20266") %>% 
+  filter(year_month_day == "202669") %>% 
   filter(lineRef == "1") #%>% 
  # group_by(time,destination,journeyCode) %>% 
   #summarise(count = n())
