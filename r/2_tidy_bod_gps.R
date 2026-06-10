@@ -34,7 +34,7 @@ bod_eg1 <- bod_eg %>%
 # create time in jny var, time_trip
 bod_eg1 <- bod_eg1 %>% 
   mutate(time = ymd_hms(time)) %>% 
-  group_by(journeyCode) %>% 
+  group_by(journeyCode) %>%    ## *WARNING* possibly need to also group_by direction and/or destination???
   # normalise time to start of journey
   mutate(time_trip = time - min(time)) %>% 
   ungroup()
