@@ -1,6 +1,10 @@
 #### leaflet map ####
 library(leaflet)
+library(RColorBrewer)
 
+palette_fun <- khroma::color("bright")
+pal <- palette_fun(7)
+pal[1:7]
 
 map <-  leaflet::leaflet() %>%
   addTiles(group = "OSM") %>% 
@@ -10,7 +14,7 @@ map <-  leaflet::leaflet() %>%
 for(i in 1:nrow(dc_routes_shape)){
   map <- map %>% 
     leaflet::addPolylines(data = dc_routes_shape[i,],
-                          color = brew_color_pal[i], 
+                          color = pal[i], 
                           stroke = TRUE,
                           weight = 10,
                           popup = paste0("direction: ",dc_routes_shape$direction_id[i], " <br>", 
@@ -34,10 +38,16 @@ map <- map %>% addCircles(data = bod_eg1,
                           color = "black",
                           fillOpacity = 0,
                           popup = ~paste0(time, "<br>", 
-                                          directionRef, "<br>",
+                                          directionRef, "<br>"
                                           ),
                           group = "original points")
 
+map <- map %>% leaflet.extras::addHeatmap(data = bod_eg1,
+                                          max = 0.8,  # default 1.0
+                                          radius = 10, #default 25
+                                          blur =  20, # default 15 (1=no blur)
+                                          group = "heatmap")
+
 map  %>% addLayersControl(baseGroups = c("OSM", "carto"),
-                          overlayGroups = c(as.character(1:nrow(dc_routes_shape)),"nearest lines","original points"),
+                          overlayGroups = c(as.character(1:nrow(dc_routes_shape)),"nearest lines","original points", "heatmap"),
                           options = layersControlOptions(collapsed = FALSE))
