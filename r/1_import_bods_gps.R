@@ -29,7 +29,8 @@ bus_loc_parquet <- open_dataset(glue("parquet/{parquet_month_dir}"))
 
 
 bod_loc_query <- bus_loc_parquet %>% 
-  filter(year_month_day == "202669") %>% 
+  filter(year_month_day %in% c("202663","202664","202668","202669")) %>% 
+ # filter(year_month_day == "202669") %>% 
   filter(lineRef == "1") #%>% 
  # group_by(time,destination,journeyCode) %>% 
   #summarise(count = n())

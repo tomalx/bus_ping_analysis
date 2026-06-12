@@ -29,7 +29,7 @@ dc_routes <- dc_routes[2]  ## WARNING ## need to specify row(s) in square bracke
 
 dc_routes <- dc_routes %>% 
   left_join(gtfs_sf$trips, by = "route_id") %>% 
-  select(route_id, route_short_name, route_long_name, shape_id, direction_id) %>% 
+  dplyr::select(route_id, route_short_name, route_long_name, shape_id, direction_id) %>% 
   distinct() %>% 
   left_join(gtfs_sf$shape, by = c("shape_id")) 
 

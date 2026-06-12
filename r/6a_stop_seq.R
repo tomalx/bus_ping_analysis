@@ -27,24 +27,38 @@ stop_seq <- bus_stats %>%
   summarise()
 # get the stop code for each stop id
 stop_seq <- stop_seq %>% left_join(gtfs_sf$stops %>% 
-                                     select(-wheelchair_boarding, 
+                                     dplyr::select(-wheelchair_boarding, 
                                             -location_type,
                                             -parent_station,
                                             -platform_code,
                                             -zone_id))
 stop_seq <- stop_seq %>% left_join(gtfs_sf$routes %>% 
-                                     select(route_id, 
+                                     dplyr::select(route_id, 
                                             route_short_name, 
                                             route_long_name))
 
 
 ###
 
-unq_long_name <- stop_seq_trip_lookup_all_stops$route_long_name %>% unique
+unq_long_name <- dc_routes$route_long_name %>% unique
 unq_long_name
-unq_long_name <- unq_long_name[2]
+unq_long_name <- unq_long_name[1]
 
-stop_seq_trip_lookup_all_stops <- stop_seq_trip_lookup_all_stops %>% 
+stop_seq_trip_lookup_all_stops <- stop_seq %>% 
   filter(route_long_name == unq_long_name)
 unq_route_id <- stop_seq_trip_lookup_all_stops$route_id %>% unique()
 bus_stats <- bus_stats %>% filter(route_id %in% unq_route_id)
+
+
+longest_stop_seq <- 
+  stop_seq_trip_lookup_all_stops %>% 
+  group_by(shape_id, direction_id) %>% 
+  count() %>% 
+  group_by(direction_id) %>% 
+  filter(n == max(n))
+
+stop_seq_trip_lookup_all_stops <-
+  stop_seq_trip_lookup_all_stops %>% 
+  filter(shape_id %in% longest_stop_seq$shape_id)
+
+
