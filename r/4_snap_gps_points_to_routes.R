@@ -12,7 +12,7 @@ nearest_lines <- st_union(dc_routes_shape) %>% st_nearest_points(bod_eg1)
 # mapview::mapview(nearest_lines)
 
 # Extract the second point from each LINESTRING (i.e., snapped point)
-snapped_points <- st_cast(nearest_lines, "POINT")[seq(2, length(nearest_lines)*2, by = 2)]
+snapped_points <- st_cast(nearest_lines, "POINT")[seq(1, length(nearest_lines)*2, by = 2)]
 
 # Create a new sf object with original attributes and the snapped geometry
 bod_snap <- st_sf(
