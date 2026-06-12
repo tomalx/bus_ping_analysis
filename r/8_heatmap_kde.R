@@ -93,8 +93,8 @@ leaflet() %>% addProviderTiles("CartoDB.Positron", group = "carto") %>%
   #                group = "heatmap 2") %>%
   leaflet.extras::addHeatmap(data = pings,
                                  max = 0.8,  # default 1.0
-                                 radius = 10, #default 25
-                                 blur =  20, # default 15 (1=no blur)
+                                 radius = 5, #default 25
+                                 blur =  10, # default 15 (1=no blur)
                                  group = "heatmap 1") %>% 
   # addLegend(pal = palRaster, 
   #           values = kde2$z, 
