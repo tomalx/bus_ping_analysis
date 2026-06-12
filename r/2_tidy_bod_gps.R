@@ -17,6 +17,8 @@ bod_eg <- bod_loc_query %>%
   mutate(route_destination = word(route_destination,1, sep = "__"))
 toc()
 
+rm(bod_loc_query) # don't need this anymore?
+
 # filter services that have same route number (6 in Bath, 6 in Bristol etc)
 bod_eg$ticketMachineServiceCode %>% unique()
 unique_service_code <- bod_eg$ticketMachineServiceCode %>% unique() 
