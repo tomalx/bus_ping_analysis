@@ -25,7 +25,7 @@ unique_service_code <- bod_eg$ticketMachineServiceCode %>% unique()
 unique_service_code <- unique_service_code[1] 
 
 # filter for e.g. m1 inbound
-bod_eg1 <- bod_eg %>%
+bod_eg <- bod_eg %>%
   filter(ticketMachineServiceCode %in% unique_service_code) %>% 
   #filter(ticketMachineServiceCode == "U1" & directionRef == direction) %>%
   #filter(journeyCode == "0630") %>% 
@@ -34,7 +34,7 @@ bod_eg1 <- bod_eg %>%
 
 
 # create time in jny var, time_trip
-bod_eg1 <- bod_eg1 %>% 
+bod_eg <- bod_eg %>% 
   mutate(time = ymd_hms(time)) %>% 
   group_by(journeyCode) %>%    ## *WARNING* possibly need to also group_by direction and/or destination???
   # normalise time to start of journey
