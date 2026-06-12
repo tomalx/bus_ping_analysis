@@ -33,7 +33,7 @@ dc_routes <- dc_routes %>%
   distinct() %>% 
   left_join(gtfs_sf$shape, by = c("shape_id")) 
 
-dc_routes_shape <- dc_routes %>% #filter(direction_id == 1) %>%
+dc_routes <- dc_routes %>% #filter(direction_id == 1) %>%
   st_as_sf(crs = 27700) %>% 
   st_transform(4326)
 
