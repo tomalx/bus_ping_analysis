@@ -5,8 +5,19 @@
 # performing the 'st_nearest_points' function in a loop where the raw BOD points
 # are only snapped to their corresponding gtfs route shape.
 
+### need to run 6a_stop_seq first
+## TO DO snap bod_eg points to correct route geometry
 
-nearest_lines <- st_union(dc_routes_shape) %>% st_nearest_points(bod_eg1)
+in_out_lookup <- stop_seq_trip_lookup_all_stops %>% 
+  ungroup() %>% 
+  filter(stop_sequence == 1) %>% 
+  dplyr::select(stop_code, direction_id)
+
+bod_eg <- bod_eg %>% 
+  left_join(in_out_lookup, by = c("originRef" = "stop_code"))
+
+
+nearest_lines <- st_union(dc_routes) %>% st_nearest_points(bod_eg)
 
 ## check using the correct route shape: e.g. visualise lines with
 # mapview::mapview(nearest_lines)
