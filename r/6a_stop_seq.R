@@ -42,23 +42,23 @@ stop_seq <- stop_seq %>% left_join(gtfs_sf$routes %>%
 
 unq_long_name <- dc_routes$route_long_name %>% unique
 unq_long_name
-unq_long_name <- unq_long_name[1]
+unq_long_name <- unq_long_name[1] # use to select a specific route (not required?)
 
-stop_seq_trip_lookup_all_stops <- stop_seq %>% 
+stop_seq <- stop_seq %>% 
   filter(route_long_name == unq_long_name)
-unq_route_id <- stop_seq_trip_lookup_all_stops$route_id %>% unique()
+unq_route_id <- stop_seq$route_id %>% unique()
 bus_stats <- bus_stats %>% filter(route_id %in% unq_route_id)
 
 
 longest_stop_seq <- 
-  stop_seq_trip_lookup_all_stops %>% 
+  stop_seq %>% 
   group_by(shape_id, direction_id) %>% 
   count() %>% 
   group_by(direction_id) %>% 
   filter(n == max(n))
 
-stop_seq_trip_lookup_all_stops <-
-  stop_seq_trip_lookup_all_stops %>% 
+stop_seq <-
+  stop_seq %>% 
   filter(shape_id %in% longest_stop_seq$shape_id)
 
 

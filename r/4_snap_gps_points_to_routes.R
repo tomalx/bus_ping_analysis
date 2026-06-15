@@ -8,8 +8,8 @@
 ### need to run 6a_stop_seq first
 ## TO DO snap bod_eg points to correct route geometry
 
-in_out_lookup <- stop_seq_trip_lookup_all_stops %>% 
-  ungroup() %>% 
+in_out_lookup <- stop_seq %>%     # BOD pings use inbound/outbound, whereas
+  ungroup() %>%                   # GTFS uses 1/0, 
   filter(stop_sequence == 1) %>% 
   dplyr::select(stop_code, direction_id)
 
@@ -27,7 +27,7 @@ snapped_points <- st_cast(nearest_lines, "POINT")[seq(1, length(nearest_lines)*2
 
 # Create a new sf object with original attributes and the snapped geometry
 bod_snap <- st_sf(
-  st_drop_geometry(bod_eg1),   # keeps original attributes
+  st_drop_geometry(bod_eg),   # keeps original attributes
   geometry = snapped_points    # uses snapped points as geometry
 )
 
