@@ -16,6 +16,17 @@ in_out_lookup <- stop_seq %>%     # BOD pings use inbound/outbound, whereas
 bod_eg <- bod_eg %>% 
   left_join(in_out_lookup, by = c("originRef" = "stop_code"))
 
+# filter out pings that are x metres from routes
+  # buffered routes
+dc_routes_buffered <- dc_routes %>% 
+  st_buffer(100) %>%
+  st_union() %>% 
+  st_make_valid() %>% 
+  st_transform(4326) 
+
+
+bod_eg <- bod_eg %>% st_difference(dc_routes_buffered)
+
 
 
 nearest_lines_0 <- st_union(dc_routes %>% filter(direction_id == 0)) %>% 
@@ -39,6 +50,8 @@ bod_snap_1 <- st_sf(
   st_drop_geometry(bod_eg %>% filter(direction_id == 1)),   # keeps original attributes
   geometry = snapped_points_1    # uses snapped points as geometry
 )
+
+# remove pings that are 
 
 
 #### leaflet map ####

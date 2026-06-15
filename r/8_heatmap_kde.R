@@ -16,10 +16,10 @@ library("data.table")
 
 #MASS::kde2d()
 
-pings <- bod_snap %>% filter(directionRef == "outbound") %>% 
+pings <- bod_snap_0  %>% # filter(directionRef == "outbound") %>% 
   filter(hour(time) == 8)
 
-end_stops <- stop_seq_trip_lookup_all_stops %>% filter(stop_sequence == 1) # get first and last stops
+end_stops <- stop_seq %>% filter(stop_sequence == 1) # get first and last stops
 end_stops <- gtfs_sf$stops %>% filter(stop_code %in% end_stops$stop_code) # find coordinates
 end_stops <- end_stops %>% st_buffer(90) %>% st_transform(4326)
 
