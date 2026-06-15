@@ -25,7 +25,7 @@ dc_routes_buffered <- dc_routes %>%
   st_transform(4326) 
 
 
-bod_eg <- bod_eg %>% st_difference(dc_routes_buffered)
+bod_eg <- bod_eg %>% st_intersection(dc_routes_buffered)
 
 
 
