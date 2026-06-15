@@ -17,20 +17,28 @@ bod_eg <- bod_eg %>%
   left_join(in_out_lookup, by = c("originRef" = "stop_code"))
 
 
-nearest_lines <- st_union(dc_routes) %>% st_nearest_points(bod_eg)
+
+nearest_lines_0 <- st_union(dc_routes %>% filter(direction_id == 0)) %>% 
+  st_nearest_points(bod_eg %>% filter(direction_id == 0))
+nearest_lines_1 <- st_union(dc_routes %>% filter(direction_id == 1)) %>% 
+  st_nearest_points(bod_eg %>% filter(direction_id == 1))
 
 ## check using the correct route shape: e.g. visualise lines with
 # mapview::mapview(nearest_lines)
 
 # Extract the second point from each LINESTRING (i.e., snapped point)
-snapped_points <- st_cast(nearest_lines, "POINT")[seq(1, length(nearest_lines)*2, by = 2)]
+snapped_points_0 <- st_cast(nearest_lines_0, "POINT")[seq(1, length(nearest_lines_0)*2, by = 2)]
+snapped_points_1 <- st_cast(nearest_lines_1, "POINT")[seq(1, length(nearest_lines_1)*2, by = 2)]
 
 # Create a new sf object with original attributes and the snapped geometry
-bod_snap <- st_sf(
-  st_drop_geometry(bod_eg),   # keeps original attributes
-  geometry = snapped_points    # uses snapped points as geometry
+bod_snap_0 <- st_sf(
+  st_drop_geometry(bod_eg %>% filter(direction_id == 0)),   # keeps original attributes
+  geometry = snapped_points_0    # uses snapped points as geometry
 )
-
+bod_snap_1 <- st_sf(
+  st_drop_geometry(bod_eg %>% filter(direction_id == 1)),   # keeps original attributes
+  geometry = snapped_points_1    # uses snapped points as geometry
+)
 
 
 #### leaflet map ####
