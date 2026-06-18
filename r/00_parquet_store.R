@@ -43,6 +43,7 @@ parquet_month_dir <- as.character(paste0(year(Sys.Date()),month(Sys.Date())))
 
 bus_loc_csv %>% 
   group_by(year_month_day) %>% 
+  # drop all except most frequent year_month_day group - assumes creating a one day parquet file
   write_dataset(path = paste0("parquet/",parquet_month_dir), format = "parquet")
 
 tibble(

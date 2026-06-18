@@ -52,6 +52,8 @@ rsconnect/
 csv/bus_loc_*.csv
 rds/bod*.rds
 parquet/
+html/
+explore_pings/
 
 
 

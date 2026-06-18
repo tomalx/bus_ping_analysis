@@ -22,7 +22,7 @@ dc_routes <- gtfs_sf$routes %>% filter(route_short_name %in% c("1"))
 
 cat("select specific route(s): \n")
 for( n in 1:nrow(dc_routes)){
-  cat(n," ---- ",dc_routes$route_short_name[n]," ", dc_routes$route_long_name[n],"\n")
+  cat(n," ---->    ",dc_routes$route_short_name[n]," ", dc_routes$route_long_name[n],"\n")
 }
 
 dc_routes <- dc_routes[2]  ## WARNING ## need to specify row(s) in square brackets
