@@ -6,17 +6,18 @@ library(tidyr)
 library(lubridate)
 library(scales)
 
-bod_eg1 <- bod_eg1 %>%
-  filter(journeyCode %in% c("0817","0847","0902","0918", "0933")) %>% 
+bod_plot <- bod_snap_0_dist %>%
+  filter(journeyCode %in% c("0802","0818","0832","0850")) %>% 
+  filter(day == 10) %>% 
   #filter(journeyCode %in% c("0630")) %>% 
-  mutate(time = ymd_hms(time)) %>% 
-  group_by(journeyCode) %>% 
+  # mutate(time = ymd_hms(time)) %>% 
+  # group_by(journeyCode) %>% 
   # normalise time to start of journey
-  mutate(time_trip = time - min(time)) %>% 
+  #mutate(time_trip = time - min(time)) %>% 
   ungroup()
 
 # line plot of time in secs by distance travelled, colour by journeyCode
-ggplot(bod_eg1, aes(x = time_trip, y = dist_m, color = journeyCode)) +
+ggplot(bod_plot, aes(x = time_trip, y = dist_m, color = journeyCode)) +
   geom_line() +
   scale_x_time(labels = label_timespan(unit = "secs")) +
   scale_y_continuous(labels = label_number(scale = 1e-3, suffix = " km")) +
