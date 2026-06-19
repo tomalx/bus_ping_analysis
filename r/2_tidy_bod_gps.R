@@ -30,13 +30,15 @@ bod_eg <- bod_eg %>%
   #filter(ticketMachineServiceCode == "U1" & directionRef == direction) %>%
   #filter(journeyCode == "0630") %>% 
   st_as_sf(coords = c("lng","lat"), crs = 4326) %>% 
-  mutate(journeyCode = as.factor(journeyCode))
+  mutate(journeyCode = as.factor(journeyCode)) %>% 
+  mutate(journeyCodeUnq = paste0(journeyCode,"-",vehicleId
+  ))
 
 
 # create time in jny var, time_trip
 bod_eg <- bod_eg %>% 
   mutate(time = ymd_hms(time)) %>% 
-  group_by(journeyCode) %>%    ## *WARNING* possibly need to also group_by direction and/or destination???
+  group_by(journeyCodeUnq,year_month_day) %>%    ## *WARNING* possibly need to also group_by direction and/or destination???
   # normalise time to start of journey
   mutate(time_trip = time - min(time)) %>% 
   ungroup()
