@@ -48,6 +48,7 @@ bod_plot <- bod_snap_0 %>%
   #                           # "0906","0921","0922","0938","0952","0957"
   #                           )) %>%
   filter(day == 10) %>% 
+  filter(dist_m > 1) %>% 
   #filter(journeyCode %in% c("0630")) %>% 
   # mutate(time = ymd_hms(time)) %>% 
   # group_by(journeyCode) %>% 
