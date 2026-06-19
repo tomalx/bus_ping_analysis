@@ -35,10 +35,11 @@ bod_eg <- bod_eg %>%
   ))
 
 
-# create time in jny var, time_trip
-bod_eg <- bod_eg %>% 
-  mutate(time = ymd_hms(time)) %>% 
-  group_by(journeyCodeUnq,year_month_day) %>%    ## *WARNING* possibly need to also group_by direction and/or destination???
-  # normalise time to start of journey
-  mutate(time_trip = time - min(time)) %>% 
-  ungroup()
+# create time in jny var, time_trip - 
+# move this after dist_m has been calculated (so that layover at start of trip can be removed)
+# bod_eg <- bod_eg %>% 
+#   mutate(time = ymd_hms(time)) %>% 
+#   group_by(journeyCodeUnq,year_month_day) %>%    ## *WARNING* possibly need to also group_by direction and/or destination???
+#   # normalise time to start of journey
+#   mutate(time_trip = time - min(time)) %>% 
+#   ungroup()

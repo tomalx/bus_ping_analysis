@@ -43,17 +43,17 @@ bod_snap_0 <- bod_snap_0 %>%
 bod_plot <- bod_snap_0 %>%
   mutate(journeyCodeUnq = paste0(journeyCode,"-",vehicleId
                                  )) %>% 
-  # filter(journeyCode %in% c(#"0802","0818","0832",
-  #                           "0850"
-  #                           # "0906","0921","0922","0938","0952","0957"
-  #                           )) %>%
-  filter(day == 10) %>% 
-  filter(dist_m > 1) %>% 
+  #  filter(journeyCode %in% c(#"0802","0818","0832",
+  #                            "0850"
+  # #                           # "0906","0921","0922","0938","0952","0957"
+  #                            )) %>%
+ # filter(day == 9) %>% 
+  filter(dist_m > 134) %>% 
   #filter(journeyCode %in% c("0630")) %>% 
   # mutate(time = ymd_hms(time)) %>% 
-  # group_by(journeyCode) %>% 
+  group_by(journeyCode) %>% 
   # normalise time to start of journey
-  #mutate(time_trip = time - min(time)) %>% 
+  mutate(time_trip = time - min(time)) %>% 
   ungroup()
 
 # line plot of time in secs by distance travelled, colour by journeyCode
@@ -65,4 +65,5 @@ ggplot(bod_plot, aes(y = time_trip, x = dist_m, color = journeyCodeUnq)) +
        y = "Time (s)",
        x = "Distance (km)",
        color = "Journey Code") +
-  theme_minimal()
+  theme_minimal() +
+  theme(legend.position="none")
