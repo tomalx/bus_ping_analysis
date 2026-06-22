@@ -1,0 +1,82 @@
+
+
+# make in/out direction lookup dataframe from stop_sequence data frame
+in_out_lookup <- stop_seq %>%     # BOD pings use inbound/outbound, whereas
+  ungroup() %>%                   # GTFS uses 1/0, 
+  filter(stop_sequence == 1) %>% 
+  dplyr::select(stop_code, direction_id)
+
+
+
+# snap points function
+
+ping_snapper <- function(pings, dir_lookup, route_shape){
+  
+  
+  
+}
+
+
+
+bod_eg <- bod_eg %>% 
+  left_join(in_out_lookup, by = c("originRef" = "stop_code"))
+bod_eg_am <- bod_eg_am %>% 
+  left_join(in_out_lookup, by = c("originRef" = "stop_code"))
+
+# filter out pings that are x metres from routes
+# buffered routes
+dc_routes_buffered <- dc_routes %>% 
+  st_buffer(100) %>%
+  st_union() %>% 
+  st_make_valid() %>% 
+  st_transform(4326) 
+
+
+bod_eg <- bod_eg %>% st_intersection(dc_routes_buffered)
+bod_eg_am <- bod_eg_am %>% st_intersection(dc_routes_buffered)
+
+nearest_lines_0 <- st_union(dc_routes %>% filter(direction_id == 0)) %>% 
+  st_nearest_points(bod_eg %>% filter(direction_id == 0))
+nearest_lines_1 <- st_union(dc_routes %>% filter(direction_id == 1)) %>% 
+  st_nearest_points(bod_eg %>% filter(direction_id == 1))
+
+nearest_lines_0_am <- st_union(dc_routes %>% filter(direction_id == 0)) %>% 
+  st_nearest_points(bod_eg_am %>% filter(direction_id == 0))
+nearest_lines_1_am <- st_union(dc_routes %>% filter(direction_id == 1)) %>% 
+  st_nearest_points(bod_eg_am %>% filter(direction_id == 1))
+
+## check using the correct route shape: e.g. visualise lines with
+# mapview::mapview(nearest_lines)
+
+# Extract the second point from each LINESTRING (i.e., snapped point)
+snapped_points_0 <- st_cast(nearest_lines_0, "POINT")[seq(1, length(nearest_lines_0)*2, by = 2)]
+snapped_points_1 <- st_cast(nearest_lines_1, "POINT")[seq(1, length(nearest_lines_1)*2, by = 2)]
+
+snapped_points_0_am <- st_cast(nearest_lines_0_am, "POINT")[seq(1, length(nearest_lines_0_am)*2, by = 2)]
+snapped_points_1_am <- st_cast(nearest_lines_1_am, "POINT")[seq(1, length(nearest_lines_1_am)*2, by = 2)]
+
+
+# Create a new sf object with original attributes and the snapped geometry
+bod_snap_0 <- st_sf(
+  st_drop_geometry(bod_eg %>% filter(direction_id == 0)),   # keeps original attributes
+  geometry = snapped_points_0    # uses snapped points as geometry
+)
+bod_snap_1 <- st_sf(
+  st_drop_geometry(bod_eg %>% filter(direction_id == 1)),   # keeps original attributes
+  geometry = snapped_points_1    # uses snapped points as geometry
+)
+
+bod_snap_0_am <- st_sf(
+  st_drop_geometry(bod_eg_am %>% filter(direction_id == 0)),   # keeps original attributes
+  geometry = snapped_points_0_am    # uses snapped points as geometry
+)
+bod_snap_1_am <- st_sf(
+  st_drop_geometry(bod_eg_am %>% filter(direction_id == 1)),   # keeps original attributes
+  geometry = snapped_points_1_am    # uses snapped points as geometry
+)
+
+
+
+
+
+ 
