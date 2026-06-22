@@ -28,7 +28,6 @@ dc_routes_buffered <- dc_routes %>%
 bod_eg <- bod_eg %>% st_intersection(dc_routes_buffered)
 
 
-
 nearest_lines_0 <- st_union(dc_routes %>% filter(direction_id == 0)) %>% 
   st_nearest_points(bod_eg %>% filter(direction_id == 0))
 nearest_lines_1 <- st_union(dc_routes %>% filter(direction_id == 1)) %>% 

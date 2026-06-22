@@ -7,6 +7,7 @@ library(lubridate)
 library(scales)
 
 
+
 # function to calculate distance along route
 route_distance_calc <- function(points_sf , line_sf, density = 0.5) {
   # Transform to projected CRS for accurate distance (e.g. British National Grid)

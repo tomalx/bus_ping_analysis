@@ -35,7 +35,7 @@ bod_loc_query <- bus_loc_parquet %>%
   filter(year_month_day %in% c("202669","2026610")) %>%
   #filter(year_month_day %in% c("202662","202663","202664","202665","202668","202669","2026610")) %>% 
  # filter(year_month_day == "202669") %>% 
-  filter(lineRef == "1") #%>% 
+  filter(lineRef == "42") #%>% 
  # group_by(time,destination,journeyCode) %>% 
   #summarise(count = n())
 #group_by(lineRef, journeyCode, destination) %>% 

@@ -1,6 +1,6 @@
 # stop seq
 
-routes_select <- c("1")
+routes_select <- c("42")
 
 routes_filtered <- gtfs_sf$routes %>% filter(route_short_name %in% routes_select)
 

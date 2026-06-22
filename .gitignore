@@ -54,6 +54,7 @@ rds/bod*.rds
 parquet/
 html/
 explore_pings/
+todo.txt
 
 
 
