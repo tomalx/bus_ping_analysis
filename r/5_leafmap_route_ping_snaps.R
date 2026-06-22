@@ -25,19 +25,19 @@ for(i in 1:nrow(dc_routes)){
   
 }
 
-map <- map %>% addPolylines(data = nearest_lines_0,
-                            weight = 0.6,
-                            color = "#444444",
-                            opacity = 0.5,
-                            #dashArray = "2,2",
-                            group = "nearest lines out")
-
-map <- map %>% addPolylines(data = nearest_lines_1,
-                            weight = 0.6,
-                            color = "#444444",
-                            opacity = 0.5,
-                            #dashArray = "2,2",
-                            group = "nearest lines in")
+# map <- map %>% addPolylines(data = nearest_lines_0,
+#                             weight = 0.6,
+#                             color = "#444444",
+#                             opacity = 0.5,
+#                             #dashArray = "2,2",
+#                             group = "nearest lines out")
+# 
+# map <- map %>% addPolylines(data = nearest_lines_1,
+#                             weight = 0.6,
+#                             color = "#444444",
+#                             opacity = 0.5,
+#                             #dashArray = "2,2",
+#                             group = "nearest lines in")
 
 map <- map %>% addCircles(data = bod_eg %>% filter(direction_id == 0),
                           radius = 0.5,
@@ -91,7 +91,19 @@ map <- map %>% leaflet.extras::addHeatmap(data = bod_snap_1 ,
                                           blur =  20, # default 15 (1=no blur)
                                           group = "heatmap in")
 
-map  %>% addLayersControl(baseGroups = c("OSM", "carto"),
+map <- map %>% leaflet.extras::addHeatmap(data = bod_snap_0_am ,
+                                          max = 0.8,  # default 1.0
+                                          radius = 10, #default 25
+                                          blur =  20, # default 15 (1=no blur)
+                                          group = "heatmap out am")
+
+map <- map %>% leaflet.extras::addHeatmap(data = bod_snap_1_am ,
+                                          max = 0.8,  # default 1.0
+                                          radius = 10, #default 25
+                                          blur =  20, # default 15 (1=no blur)
+                                          group = "heatmap in am")
+
+map <- map  %>% addLayersControl(baseGroups = c("OSM", "carto"),
                           overlayGroups = c(as.character(1:nrow(dc_routes)),
                                             "nearest lines in",
                                             "nearest lines out",
@@ -100,6 +112,11 @@ map  %>% addLayersControl(baseGroups = c("OSM", "carto"),
                                             "snapped points in",
                                             "snapped points out",
                                             "heatmap in",
-                                            "heatmap out"
+                                            "heatmap out",
+                                            "heatmap in am",
+                                            "heatmap out am"
+                                            
                                             ),
                           options = layersControlOptions(collapsed = FALSE))
+
+map %>% hideGroup(c(as.character(1:nrow(dc_routes))))
