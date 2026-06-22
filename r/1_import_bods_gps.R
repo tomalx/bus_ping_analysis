@@ -22,7 +22,9 @@
 library(arrow)
 library(dplyr)
 library(glue)
+
 setwd("bus_ping_analysis")
+  
 parquet_month_dir <- "20266" # YYYYM / YYYYMM
 
 parquet_path <- "parquet"
