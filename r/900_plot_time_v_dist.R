@@ -34,14 +34,14 @@ route_distance_calc <- function(points_sf , line_sf, density = 0.5) {
   return(as.numeric(distance_along))
 }
 
-route_0 <- longest_stop_seq %>% filter(direction_id == 0) %>% pull(shape_id)
-route_eg_0 <- dc_routes %>% filter(shape_id == route_0)
+route_1 <- longest_stop_seq %>% filter(direction_id == 1) %>% pull(shape_id)
+route_eg_1 <- dc_routes %>% filter(shape_id == route_1)
 
-bod_snap_0 <- bod_snap_0 %>%
-  mutate(dist_m = route_distance_calc(., route_eg_0))
+bod_snap_1 <- pings_day %>%
+  mutate(dist_m = route_distance_calc(., route_eg_1))
 
 
-bod_plot <- bod_snap_0 %>%
+bod_plot <- bod_snap_1 %>% #####
   mutate(journeyCodeUnq = paste0(journeyCode,"-",vehicleId
                                  )) %>% 
   #  filter(journeyCode %in% c(#"0802","0818","0832",
@@ -52,10 +52,11 @@ bod_plot <- bod_snap_0 %>%
   filter(dist_m > 134) %>% 
   #filter(journeyCode %in% c("0630")) %>% 
   # mutate(time = ymd_hms(time)) %>% 
-  group_by(journeyCode) %>% 
+  group_by(journeyCode, day, month) %>% 
   # normalise time to start of journey
-  mutate(time_trip = time - min(time)) %>% 
-  ungroup()
+  mutate(time_trip = time - min(time))
+
+bod_plot <- bod_plot %>% dplyr::filter_out(time_trip > 7200)
 
 # line plot of time in secs by distance travelled, colour by journeyCode
 ggplot(bod_plot, aes(y = time_trip, x = dist_m, color = journeyCodeUnq)) +
