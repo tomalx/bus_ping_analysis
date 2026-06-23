@@ -10,12 +10,46 @@ in_out_lookup <- stop_seq %>%     # BOD pings use inbound/outbound, whereas
 
 # snap points function
 
-ping_snapper <- function(pings, dir_lookup, route_shape){
+ping_snapper <- function(pings, dir_lookup, route_shape, dir = 1, buff_dist = 100){
   
+  pings_2 <- pings %>% 
+    left_join(dir_lookup, by = c("originRef" = "stop_code"))
   
+  route_shape_buffered <- route_shape %>% 
+    st_buffer(buff_dist) %>%
+    st_union() %>% 
+    st_make_valid() %>% 
+    st_transform(4326) 
+  
+  pings_2 <- pings_2 %>% st_intersection(route_shape_buffered)
+  
+  # nearest_lines_0 <- st_union(route_shape %>% filter(direction_id == 0)) %>% 
+  #   st_nearest_points(pings_2 %>% filter(direction_id == 0))
+  nearest_lines_1 <- st_union(route_shape %>% filter(direction_id == dir)) %>% 
+    st_nearest_points(pings_2 %>% filter(direction_id == dir))
+  
+  # snapped_points_0 <- st_cast(nearest_lines_0, "POINT")[seq(1, length(nearest_lines_0)*2, by = 2)]
+  snapped_points_1 <- st_cast(nearest_lines_1, "POINT")[seq(1, length(nearest_lines_1)*2, by = 2)]
+  
+  # pings_0 <- st_sf(
+  #   st_drop_geometry(pings_2 %>% filter(direction_id == 0)),   # keeps original attributes
+  #   geometry = snapped_points_0    # uses snapped points as geometry
+  # )
+  pings_1 <- st_sf(
+    st_drop_geometry(pings_2 %>% filter(direction_id == dir)),   # keeps original attributes
+    geometry = snapped_points_1    # uses snapped points as geometry
+  )
+  
+  return(pings_1)
   
 }
 
+
+pings_dir1 <- ping_snapper(pings = bod_eg, dir_lookup = in_out_lookup, route_shape = dc_routes,
+                           dir = 1)
+
+pings_dir1 <- ping_snapper(pings = bod_eg_am, dir_lookup = in_out_lookup, route_shape = dc_routes,
+                           dir = 1)
 
 
 bod_eg <- bod_eg %>% 
