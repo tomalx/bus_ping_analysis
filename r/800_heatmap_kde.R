@@ -19,11 +19,15 @@ library("data.table")
 pings <- bod_snap_0  %>% # filter(directionRef == "outbound") %>% 
   filter(hour(time) == 8)
 
+pings <- pings_am
+
 end_stops <- stop_seq %>% filter(stop_sequence == 1) # get first and last stops
 end_stops <- gtfs_sf$stops %>% filter(stop_code %in% end_stops$stop_code) # find coordinates
 end_stops <- end_stops %>% st_buffer(90) %>% st_transform(4326)
 
-other_stops <- stop_seq_trip_lookup_all_stops %>% filter(direction_id == 0)
+other_stops <- stop_seq %>% group_by(direction_id) %>% 
+  filter(stop_sequence != min(stop_sequence))
+  
 other_stops <- gtfs_sf$stops %>% filter(stop_code %in% other_stops$stop_code)
 other_stops <- other_stops %>% st_transform(4326) #%>% st_buffer(20)
 
@@ -109,7 +113,8 @@ leaflet() %>% addProviderTiles("CartoDB.Positron", group = "carto") %>%
 
 ## Leaflet map with raster
 leaflet() %>% addProviderTiles("CartoDB.Positron") %>% 
-  addRasterImage(KernelDensityRaster, 
+  addRasterImage(kde_raster,
+                  #KernelDensityRaster, 
                  colors = palRaster, 
                  opacity = .6) %>%
   addLegend(pal = palRaster, 
