@@ -37,7 +37,7 @@ route_distance_calc <- function(points_sf , line_sf, density = 0.5) {
 route_1 <- longest_stop_seq %>% filter(direction_id == 1) %>% pull(shape_id)
 route_eg_1 <- dc_routes %>% filter(shape_id == route_1)
 
-bod_snap_1 <- pings_day %>%
+bod_snap_1 <- bod_eg %>%
   mutate(dist_m = route_distance_calc(., route_eg_1))
 
 
@@ -56,7 +56,8 @@ bod_plot <- bod_snap_1 %>% #####
   # normalise time to start of journey
   mutate(time_trip = time - min(time))
 
-bod_plot <- bod_plot %>% filter_out(time_trip > 7200)
+bod_plot <- bod_plot %>% filter_out(time_trip > 7200) %>% 
+  filter(direction_id == 1)
 
 # line plot of time in secs by distance travelled, colour by journeyCode
 ggplot(bod_plot, aes(y = time_trip, x = dist_m, color = journeyCodeUnq)) +

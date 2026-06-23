@@ -18,14 +18,14 @@ rm(gtfs)
 # get gtfs shape(s) for specified route (and direction)
 # dc = datacutter
 
-dc_routes <- gtfs_sf$routes %>% filter(route_short_name %in% c("42"))
+dc_routes <- gtfs_sf$routes %>% filter(route_short_name %in% c("6"))
 
 cat("select specific route(s): \n")
 for( n in 1:nrow(dc_routes)){
   cat(n," ---->    ",dc_routes$route_short_name[n]," ", dc_routes$route_long_name[n],"\n")
 }
 
-dc_routes <- dc_routes[1]  ## WARNING ## need to specify row(s) in square brackets
+dc_routes <- dc_routes[2]  ## WARNING ## need to specify row(s) in square brackets
 
 dc_routes <- dc_routes %>% 
   left_join(gtfs_sf$trips, by = "route_id") %>% 
