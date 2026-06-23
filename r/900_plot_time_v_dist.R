@@ -56,7 +56,7 @@ bod_plot <- bod_snap_1 %>% #####
   # normalise time to start of journey
   mutate(time_trip = time - min(time))
 
-bod_plot <- bod_plot %>% dplyr::filter_out(time_trip > 7200)
+bod_plot <- bod_plot %>% filter_out(time_trip > 7200)
 
 # line plot of time in secs by distance travelled, colour by journeyCode
 ggplot(bod_plot, aes(y = time_trip, x = dist_m, color = journeyCodeUnq)) +
