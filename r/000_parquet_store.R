@@ -13,7 +13,7 @@ library(purrr)
 #  you need 03 Analysis Projects/bod_api/bus_ping_analysis
 bus_loc_csv <- dir(path = "csv/", pattern = ".csv", full.names = TRUE)
 bus_loc_csv
-bus_loc_csv <- map(bus_loc_csv[16:17],read.csv)
+bus_loc_csv <- map(bus_loc_csv[19:23],read.csv)
 
 #convert to date-time using lubridate
 # mutate(time = ymd_hms(time)) %>% 
