@@ -37,7 +37,7 @@ route_distance_calc <- function(points_sf , line_sf, density = 0.5) {
 route_1 <- longest_stop_seq %>% filter(direction_id == 1) %>% pull(shape_id)
 route_eg_1 <- dc_routes %>% filter(shape_id == route_1)
 
-bod_snap_1 <- bod_eg %>%
+bod_snap_1 <- pings_day %>%
   mutate(dist_m = route_distance_calc(., route_eg_1))
 
 
