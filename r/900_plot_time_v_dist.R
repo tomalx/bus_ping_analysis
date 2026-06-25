@@ -37,6 +37,8 @@ route_distance_calc <- function(points_sf , line_sf, density = 0.5) {
 route_1 <- longest_stop_seq %>% filter(direction_id == 1) %>% pull(shape_id)
 route_eg_1 <- dc_routes %>% filter(shape_id == route_1)
 
+
+
 bod_snap_1 <- pings_day %>%
   mutate(dist_m = route_distance_calc(., route_eg_1))
 
@@ -70,3 +72,68 @@ ggplot(bod_plot, aes(y = time_trip, x = dist_m, color = journeyCodeUnq)) +
        color = "Journey Code") +
   theme_minimal() +
   theme(legend.position="none")
+
+
+ggplot_time_dist <- function(pings, highlight = c(16,17)){
+  
+  bod_plot <- pings %>% #####
+  mutate(journeyCodeUnq = paste0(journeyCode,"-",vehicleId
+  )) %>% 
+    #  filter(journeyCode %in% c(#"0802","0818","0832",
+    #                            "0850"
+    # #                           # "0906","0921","0922","0938","0952","0957"
+    #                            )) %>%
+    # filter(day == 9) %>% 
+    filter(dist_m > 134) %>% 
+    #filter(journeyCode %in% c("0630")) %>% 
+    # mutate(time = ymd_hms(time)) %>% 
+    group_by(journeyCode, day, month) %>% 
+    # normalise time to start of journey
+    mutate(time_trip = time - min(time))
+  
+  plot <- ggplot(bod_plot, aes(y = time_trip, x = dist_m #, color = journeyCodeUnq
+                               )) +
+    geom_line(aes(group = journeyCodeUnq),color = "#dddddd", linewidth = 0.1) +
+    geom_line(data = bod_plot %>% filter(hour(time) %in% highlight), 
+              aes(group = journeyCodeUnq), 
+              color = "#bb44bb",
+              ) +
+    scale_y_time(labels = label_timespan(unit = "mins")) +
+    scale_x_continuous(labels = label_number(scale = 1e-3, suffix = " km")) +
+    labs(title = "Distance travelled by time",
+         y = "Time (s)",
+         x = "Distance (km)",
+         color = "Journey Code") +
+    theme_minimal() +
+    theme(legend.position="none")
+  
+  return(plot)
+}
+
+
+#test_ping
+
+#route length
+### put function in here to work out length of the route
+
+dir <- test_pings$direction_id %>% unique()
+longest_shape <- longest_stop_seq %>% filter(direction_id == dir) %>% pull(shape_id)
+line_sf <- dc_routes %>% filter(shape_id == longest_shape)
+route_length <- st_length(line_sf$geometry %>% st_transform(27700)) %>% as.numeric()
+
+pings_plot <- ggplot_time_dist(pings = test_pings)
+pings_plot
+
+test_pings_2 <- test_pings %>%
+  mutate(rank_diff = time_trip_rank - dist_m_rank) %>% 
+  group_by(journeyCodeUnq) %>%
+  #count()
+  filter(!any(time_trip > 75*60)) %>% 
+  filter(!any(rank_diff > 10)) %>% 
+  filter(!any(rank_diff < -10)) %>% 
+  filter_out(dist_m > (route_length - 50))
+
+pings_plot <- ggplot_time_dist(pings = test_pings_2, highlight = c(7,8,9))
+pings_plot
+
+

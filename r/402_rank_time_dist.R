@@ -5,7 +5,7 @@
 #   - for each trip, make sure pings are in order of distance from origin
 #   - if out of sequence - remove erroneous pings or...
 #   - delete the pings for the entire trip.
-#   - could also detelt pings if entire trip isn't represented.
+#   - could also delete pings if entire trip isn't represented.
 #   - ALSO rebase trip start time to 0 seconds - to account for pings sent before 
 #   bus has started the trip (e.g. layover between trips) - 
 
@@ -72,6 +72,11 @@ unq_od_names
 # select od_name
 unq_od_names <- unq_od_names[1]
 test_pings <- test_pings %>% filter(od_name %in% unq_od_names)
+
+test_pings <- test_pings %>% 
+  mutate(journeyCodeUnq = paste0(journeyCode,"-",vehicleId))
+
+
 
 st_length(route_eg_1$geometry %>% st_transform(27700))
 
