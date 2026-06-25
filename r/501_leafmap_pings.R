@@ -39,82 +39,82 @@ for(i in 1:nrow(dc_routes)){
 #                             #dashArray = "2,2",
 #                             group = "nearest lines in")
 
-map <- map %>% addCircles(data = bod_eg %>% filter(direction_id == 0),
-                          radius = 0.5,
-                          weight = 0.3,
-                          color = pal[3],
-                          fillOpacity = 0.5,
-                          popup = ~paste0(time, "<br>", 
-                                          directionRef, "<br>"
-                                          ),
-                          group = "original points out")
+# map <- map %>% addCircles(data = bod_eg %>% filter(direction_id == 0),
+#                           radius = 0.5,
+#                           weight = 0.3,
+#                           color = pal[1],
+#                           fillOpacity = 0.5,
+#                           popup = ~paste0(time, "<br>", 
+#                                           directionRef, "<br>"
+#                                           ),
+#                           group = "original points out")
 
-map <- map %>% addCircles(data = bod_eg %>% filter(direction_id == 1),
-                          radius = 0.5,
-                          weight = 0.3,
-                          color = pal[4],
-                          fillOpacity = 0.5,
-                          popup = ~paste0(time, "<br>", 
-                                          directionRef, "<br>"
-                          ),
-                          group = "original points in")
+# map <- map %>% addCircles(data = bod_eg %>% filter(direction_id == 1),
+#                           radius = 0.5,
+#                           weight = 0.3,
+#                           color = pal[2],
+#                           fillOpacity = 0.5,
+#                           popup = ~paste0(time, "<br>", 
+#                                           directionRef, "<br>"
+#                           ),
+#                           group = "original points in")
 
-map <- map %>% addCircles(data = bod_snap_0,
+map <- map %>% addCircles(data = pings_day %>% filter(direction_id == 0),
                           radius = 0.8,
                           weight = 0.5,
-                          color = pal[3],
+                          color = pal[2],
                           fillOpacity = 0,
                           popup = ~paste0(time, "<br>", 
                                           directionRef, "<br>"
                           ),
                           group = "snapped points out")
 
-map <- map %>% addCircles(data = bod_snap_1,
+map <- map %>% addCircles(data = pings_day %>% filter(direction_id == 1),
                           radius = 0.8,
                           weight = 0.5,
-                          color = pal[4],
+                          color = pal[1],
                           fillOpacity = 0,
                           popup = ~paste0(time, "<br>", 
                                           directionRef, "<br>"
                           ),
                           group = "snapped points in")
 
-map <- map %>% leaflet.extras::addHeatmap(data = bod_snap_0 ,
+map <- map %>% leaflet.extras::addHeatmap(data = pings_day %>% filter(direction_id == 0) ,
                                           max = 0.8,  # default 1.0
                                           radius = 10, #default 25
                                           blur =  20, # default 15 (1=no blur)
                                           group = "heatmap out")
 
-map <- map %>% leaflet.extras::addHeatmap(data = bod_snap_1 ,
+map <- map %>% leaflet.extras::addHeatmap(data = pings_day %>% filter(direction_id == 1) ,
                                           max = 0.8,  # default 1.0
                                           radius = 10, #default 25
                                           blur =  20, # default 15 (1=no blur)
                                           group = "heatmap in")
 
-map <- map %>% leaflet.extras::addHeatmap(data = bod_snap_0_am ,
-                                          max = 0.8,  # default 1.0
-                                          radius = 10, #default 25
-                                          blur =  20, # default 15 (1=no blur)
-                                          group = "heatmap out am")
-
-map <- map %>% leaflet.extras::addHeatmap(data = bod_snap_1_am ,
-                                          max = 0.8,  # default 1.0
-                                          radius = 10, #default 25
-                                          blur =  20, # default 15 (1=no blur)
-                                          group = "heatmap in am")
+# map <- map %>% leaflet.extras::addHeatmap(data = bod_snap_0_am ,
+#                                           max = 0.8,  # default 1.0
+#                                           radius = 10, #default 25
+#                                           blur =  20, # default 15 (1=no blur)
+#                                           group = "heatmap out am")
+# 
+# map <- map %>% leaflet.extras::addHeatmap(data = bod_snap_1_am ,
+#                                           max = 0.8,  # default 1.0
+#                                           radius = 10, #default 25
+#                                           blur =  20, # default 15 (1=no blur)
+#                                           group = "heatmap in am")
 
 map <- map  %>% addLayersControl(baseGroups = c("OSM", "carto"),
                           overlayGroups = c(as.character(1:nrow(dc_routes)),
-                                            "nearest lines in",
-                                            "nearest lines out",
-                                            "original points in",
-                                            "original points out",
+                                           # "nearest lines in",
+                                           # "nearest lines out",
+                                           # "original points in",
+                                           # "original points out",
                                             "snapped points in",
                                             "snapped points out",
                                             "heatmap in",
-                                            "heatmap out",
-                                            "heatmap in am",
-                                            "heatmap out am"
+                                            "heatmap out"
+                                           # "heatmap in am",
+                                           # "heatmap out am"
                                             
                                             ),
                           options = layersControlOptions(collapsed = FALSE))

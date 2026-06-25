@@ -19,12 +19,42 @@ unique_trip_OD <- function(pings){
   return(pings_2)
 }
 
-test_pings <- pings_day %>% unique_trip_OD()
+route_distance_calc <- function(pings , routes,  longest_stop_seq = longest_stop_seq, density = 0.5) {
+  # Transform to projected CRS for accurate distance (e.g. British National Grid)
+  points_sf <- st_transform(pings, 27700)
+  dir <- points_sf$direction_id %>% unique()
+  longest_shape <- longest_stop_seq %>% filter(direction_id == dir) %>% pull(shape_id)
+  line_sf <- routes %>% filter(shape_id == longest_shape)
+  
+  line_sf <- st_transform(line_sf, 27700)
+  
+  # Get line geometry
+  # set crs to WGS84
+  route <- st_geometry(line_sf) 
+  
+  # Sample points densely along the line to serve as reference path
+  sampled_points <- st_line_sample(route, density = density) %>% st_cast("POINT")
+  
+  # Snap each point to the nearest sampled point on the line
+  nearest_index <- st_nearest_feature(points_sf, sampled_points)
+  
+  # Calculate cumulative distance along the line for sampled points
+  dist_along_line <- c(0, cumsum(st_distance(sampled_points[-length(sampled_points)],
+                                             sampled_points[-1], by_element = TRUE)))
+  
+  # Assign distance based on nearest sampled point
+  distance_along <- dist_along_line[nearest_index]
+  
+  return(as.numeric(distance_along))
+}
+
+
+test_pings <- pings_day_0 %>% unique_trip_OD()
 #glimpse(test_pings)
 
 test_pings <- test_pings %>%
   #group_by(journeyCode, day, month) %>% 
-  mutate(dist_m = route_distance_calc(., route_eg_1))
+  mutate(dist_m = route_distance_calc(., routes = dc_routes, longest_stop_seq = longest_stop_seq, density = 0.5))
 
 test_pings <- test_pings %>% 
   group_by(journeyCode, day, month) %>% 
