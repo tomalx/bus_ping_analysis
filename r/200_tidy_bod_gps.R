@@ -34,11 +34,13 @@ bod_eg <- bod_eg %>%
   mutate(journeyCodeUnq = paste0(journeyCode,"-",vehicleId
   ))
 
-bod_eg_am <- bod_eg %>% 
-  filter(hour(time) %in% c(8,9))
-
-bod_eg_pm <- bod_eg %>% 
-  filter(hour(time) %in% c(16,17))
+# # am 
+# bod_eg_am <- bod_eg %>% 
+#   filter(hour(time) %in% c(8,9))
+# 
+# # pm
+# bod_eg_pm <- bod_eg %>% 
+#   filter(hour(time) %in% c(16,17))
 
 # create time in jny var, time_trip - 
 # move this after dist_m has been calculated (so that layover at start of trip can be removed)
