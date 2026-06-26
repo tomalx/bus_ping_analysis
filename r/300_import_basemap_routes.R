@@ -18,7 +18,7 @@ rm(gtfs)
 # get gtfs shape(s) for specified route (and direction)
 # dc = datacutter
 
-dc_routes <- gtfs_sf$routes %>% filter(route_short_name %in% c("6"))
+dc_routes <- gtfs_sf$routes %>% filter(route_short_name %in% c(route_number))
 
 cat("select specific route(s): \n")
 for( n in 1:nrow(dc_routes)){

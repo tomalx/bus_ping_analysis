@@ -1,8 +1,9 @@
 # stop seq
 
-routes_select <- c("6")
+#routes_select <- c("3")
 
-routes_filtered <- gtfs_sf$routes %>% filter(route_short_name %in% routes_select)
+
+routes_filtered <- gtfs_sf$routes %>% filter(route_short_name %in% route_number)
 
 calendar_filtered <- gtfs_sf$calendar %>% filter(  tuesday == 1 &     # filter for mon-fri service pattern
                                                      wednesday == 1 &   # tue,wed,thu accounts for some

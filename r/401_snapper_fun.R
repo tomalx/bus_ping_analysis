@@ -44,7 +44,7 @@ ping_snapper <- function(pings, dir_lookup, route_shape, dir = 1, buff_dist = 10
   
 }
 
-ping_sample_n <- 10000
+# ping_sample_n <- 10000
 
 pings_day_1 <- 
   ping_snapper(pings = bod_eg, #%>% slice_sample(n = ping_sample_n), 
