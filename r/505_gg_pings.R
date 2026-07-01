@@ -2,6 +2,7 @@ library(basemaps)
 
 
 map_tiler_key <- read.delim("maptiler")
+map_tiler_key <- names(map_tiler_key)
 
 boundary <- st_read(choose.files()) %>% st_transform(crs = 3857)
 #bbox <- st_read(choose.files()) %>% st_transform(crs = 3857)
@@ -17,7 +18,7 @@ get_maptypes()
 
 # set defaults for the basemap
 #set_defaults(map_service = "carto", map_type = "light")  # don't need a key for carto maps
-set_defaults(map_service = "maptiler", map_type = "dataviz")
+set_defaults(map_service = "maptiler", map_type = "backdrop")
 
 # load and return basemap map as class of choice, e.g. as image using magick:
 #basemap_magick(boundary)
@@ -32,14 +33,20 @@ weca_basemap <-
 weca_basemap
 
 bod_eg_weca <- bod_eg %>% 
+  sample_n(1000) %>% 
   st_transform(crs = 3857) %>% 
   st_intersection(boundary)
 
 one_ping <- bod_eg %>% sample_n(3)
-one_hour_pings <- bod_eg %>% filter(hour(time) == 8)
+one_hour_pings <- bod_eg %>% filter(hour(time) == 8) %>% 
+  #sample_n(10000) %>% 
+  st_transform(crs = 3857) %>% 
+  st_intersection(boundary)
 
 weca_basemap +
-  ggplot2::geom_sf(data = one_ping %>% st_transform(3857)) +
+  ggplot2::geom_sf(data = one_ping %>% st_transform(3857),
+                   colour = "#a4a",
+                   size = 3) +
   ggplot2::geom_sf(data = inverse) +
   # geom_sf_label(data = one_ping, aes(label = time), 
   #               #vjust = 1.5, 
@@ -66,7 +73,9 @@ weca_basemap +
   
   weca_basemap +
     ggplot2::geom_sf(data = one_hour_pings %>% st_transform(3857),
-                     size = 0.5) +
+                     colour = "#a4a",
+                     size = 0.5,
+                     alpha = 0.1) +
     # geom_sf_label(data = one_ping, aes(label = time), 
     #               #vjust = 1.5, 
     #               size = 3, 
