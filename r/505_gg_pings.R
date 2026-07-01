@@ -18,7 +18,7 @@ get_maptypes()
 
 # set defaults for the basemap
 #set_defaults(map_service = "carto", map_type = "light")  # don't need a key for carto maps
-set_defaults(map_service = "maptiler", map_type = "backdrop")
+set_defaults(map_service = "maptiler", map_type = "dataviz")
 
 # load and return basemap map as class of choice, e.g. as image using magick:
 #basemap_magick(boundary)
@@ -38,16 +38,21 @@ bod_eg_weca <- bod_eg %>%
   st_intersection(boundary)
 
 one_ping <- bod_eg %>% sample_n(3)
-one_hour_pings <- bod_eg %>% filter(hour(time) == 8) %>% 
+two_min_pings <- bod_eg %>% 
+  filter(hour(time) == 8) %>%
+  filter(minute(time) %in% c(30:44)) %>% 
   #sample_n(10000) %>% 
   st_transform(crs = 3857) %>% 
   st_intersection(boundary)
 
 weca_basemap +
   ggplot2::geom_sf(data = one_ping %>% st_transform(3857),
-                   colour = "#a4a",
-                   size = 3) +
-  ggplot2::geom_sf(data = inverse) +
+                   colour = pal[2],
+                   size = 2) +
+  ggplot2::geom_sf(data = inverse, fill = "#eee",
+                   colour = "#666", 
+                   alpha = 0.8,
+                   linewidth = NA) +
   # geom_sf_label(data = one_ping, aes(label = time), 
   #               #vjust = 1.5, 
   #               size = 3, 
@@ -72,10 +77,10 @@ weca_basemap +
   
   
   weca_basemap +
-    ggplot2::geom_sf(data = one_hour_pings %>% st_transform(3857),
-                     colour = "#a4a",
-                     size = 0.5,
-                     alpha = 0.1) +
+    ggplot2::geom_sf(data = two_min_pings %>% st_transform(3857),
+                     colour = pal[2],
+                     size = 0.8,
+                     alpha = 0.2) +
     # geom_sf_label(data = one_ping, aes(label = time), 
     #               #vjust = 1.5, 
     #               size = 3, 
@@ -87,5 +92,8 @@ weca_basemap +
     #   stat = "sf_coordinates",
     #   min.segment.length = 10
     # ) +
-    ggplot2::geom_sf(data = inverse) 
+  ggplot2::geom_sf(data = inverse, fill = "#eee",
+                   colour = "#666", 
+                   alpha = 0.8,
+                   linewidth = NA)
   

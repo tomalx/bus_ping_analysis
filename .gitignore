@@ -53,6 +53,7 @@ csv/bus_loc_*.csv
 rds/bod*.rds
 parquet/
 html/
+qmd/
 explore_pings/
 todo.txt
 explainer
