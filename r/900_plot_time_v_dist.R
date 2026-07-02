@@ -133,7 +133,7 @@ pings_2 <- pings %>%
   filter(!any(rank_diff < -100)) %>% 
   filter_out(dist_m > (route_length - 50))
 
-pings_plot <- ggplot_time_dist(pings = pings_2, highlight = c(7,8,9))
+pings_plot <- ggplot_time_dist(pings = pings_2, highlight = c(8))
 pings_plot
 
 
