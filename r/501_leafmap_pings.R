@@ -85,7 +85,7 @@ map <- map %>% leaflet.extras::addHeatmap(data = pings, #%>% filter(direction_id
                                           blur =  20, # default 15 (1=no blur)
                                           group = "heatmap")
 
-map <- map %>% leaflet.extras::addHeatmap(data = pings_in_min %>% filter(direction_id == 1) ,
+map <- map %>% leaflet.extras::addHeatmap(data = pings %>% filter(direction_id == 0) ,
                                           max = 0.8,  # default 1.0
                                           radius = 10, #default 25
                                           blur =  20, # default 15 (1=no blur)
@@ -104,14 +104,14 @@ map <- map %>% leaflet.extras::addHeatmap(data = pings_in_min %>% filter(directi
 #                                           group = "heatmap in am")
 
 map <- map  %>% addLayersControl(baseGroups = c("OSM", "carto"),
-                          overlayGroups = c(as.character(1:nrow(dc_routes)),
+                          overlayGroups = c(#as.character(1:nrow(dc_routes)),
                                            # "nearest lines in",
                                            # "nearest lines out",
                                            # "original points in",
                                            # "original points out",
                                            # "snapped points in",
                                             "snapped points",
-                                           # "heatmap in",
+                                            "heatmap in",
                                             "heatmap"
                                            # "heatmap in am",
                                            # "heatmap out am"
