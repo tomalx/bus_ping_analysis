@@ -69,9 +69,9 @@ min_pings <- pings %>%
 return(min_pings) 
 }
 
-ping_sample_one_route <- function(route_number = "1"){
+ping_sample_one_route <- function(pings = bod_eg, route_number = "1"){
   
-  pings_unq_route <- bod_eg %>%
+  pings_unq_route <- pings %>%
     filter(ticketMachineServiceCode %in% route_number)
   return(pings_unq_route)
 }
