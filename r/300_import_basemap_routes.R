@@ -37,32 +37,3 @@ dc_routes <- dc_routes %>% #filter(direction_id == 1) %>%
   st_as_sf(crs = 27700) %>% 
   st_transform(4326)
 
-
-# library(leaflet)
-#   ## each row of data is separate layer on leaflet map
-# map <- leaflet::leaflet() %>% 
-#   leaflet::addProviderTiles("CartoDB.Positron")
-#  
-#  brew_color_pal <- RColorBrewer::brewer.pal(8,"Set1")
-#    
-#    
-#   for(i in 1:nrow(dc_routes_shape)){
-#   map <- map %>% 
-#   leaflet::addPolylines(data = dc_routes_shape[i,],
-#                         color = brew_color_pal[i], 
-#                         stroke = FALSE,
-#                         weight = 10,
-#                         popup = paste0("direction: ",dc_routes_shape$direction_id[i], " <br>", 
-#                                        dc_routes_shape$shape_id[i]),
-#                         group = as.character(i),
-#                         fillOpacity = 0.1,
-#                         opacity = 0.1)
-#     
-#   }
-#     
-#     
-#   
-# map  %>% addLayersControl(baseGroups = as.character(1:nrow(dc_routes_shape)),
-#                           options = layersControlOptions(collapsed = FALSE))
-# 
-# #dc_routes_selected <- dc_routes_shape %>% filter(direction_id == 1)
