@@ -25,7 +25,7 @@ pings_unq_trip_id <- pings %>%
   filter(hour(time) == 8) %>% 
   pull(journeyCodeUnq) %>% 
   unique() %>% 
-  sample(5)
+  sample(4)
 
 pings_unq_trip <- pings %>% 
   filter(journeyCodeUnq %in% pings_unq_trip_id)
@@ -33,7 +33,7 @@ pings_unq_trip <- pings %>%
 pings_unq_trip <- pings_unq_trip %>%
   #filter(journeyCodeUnq %in% pings_unq_trip_id) %>% 
   group_by(journeyCodeUnq) %>% 
-  filter(n() > 60) %>% 
+  filter(n() > 100) %>% 
   st_transform(crs = 3857) # %>% 
   #ungroup()
   
@@ -68,9 +68,9 @@ route_basemap <-
                  alpha = 0.4,
                  linewidth = NA) +
   ggplot2::geom_sf(data = inverse, fill = "#fff",
-                   # colour = "#666", 
-                   alpha = 0.4,
-                   linewidth = NA)
+                   colour = "#fff", 
+                   alpha = 1,
+                   linewidth = 1)
 
 route_basemap +
   ggplot2::geom_sf(data = pings_unq_trip %>% st_transform(3857),
@@ -78,6 +78,16 @@ route_basemap +
                    linewidth = NA,
                    size = 0.5,
                    alpha = 0.4)
+
+route_basemap +
+ggplot2::geom_sf(data = pings_unq_trip %>% st_transform(3857),# %>% filter(journeyCode == "0823"),
+                 aes(color = journeyCodeUnq),
+                 #colour = pal[2],
+                 linewidth = NA,
+                 size = 1,
+                 alpha = 0.6) +
+  scale_colour_manual(values=rep(pal[1:6],10)) +
+  facet_grid(rows = ~journeyCodeUnq)
 
 ggsave(filename = glue::glue("qmd/pings_unq_route_focus.jpeg"),
        plot = get_last_plot(),
@@ -93,7 +103,10 @@ route_basemap +
                    colour = pal[2],
                    linewidth = NA,
                    size = 1,
-                   alpha = 0.8)
+                   alpha = 0.8) +
+  labs(title = "pings on 1 route", caption = "07:28") +
+  theme(plot.title = element_text(hjust = 1, vjust = -10),
+        plot.caption = element_text(hjust = 0, vjust = 15, size = 20, face = "bold", colour = "#888"))
 
 ggsave(filename = glue::glue("qmd/pings_unq_route_focus.jpeg"),
        plot = get_last_plot(),
@@ -104,27 +117,70 @@ ggsave(filename = glue::glue("qmd/pings_unq_route_focus.jpeg"),
 
 ## animate pings 
 
+# pings_anim <- 
+#   route_basemap +
+#   ggplot2::geom_sf(data = pings_unq_trip %>% st_transform(3857),# %>%  filter(journeyCode == "0751"),
+#                    aes(#group = journeyCodeUnq, 
+#                        # color = dist_m_rank),
+#                       color = journeyCodeUnq),
+#                    #colour = pal[2],
+#                    linewidth = NA,
+#                    size = 4,
+#                    alpha = 0.8) +
+#   scale_colour_manual(values=rep(pal_bright[5:6],10)) #+
+  #facet_grid(rows = ~journeyCodeUnq)
+  # scale_color_binned(palette = pal_rainbow[2:7])
+
+
+# use geom_point instead of geom_sf
+pings_unq_trip_pnt <- pings_unq_trip %>% ungroup() %>% 
+  mutate(x = st_coordinates(pings_unq_trip)[,1]) %>% 
+  mutate(y = st_coordinates(pings_unq_trip)[,2]) %>% 
+  st_drop_geometry()
+
 pings_anim <- 
   route_basemap +
-  ggplot2::geom_sf(data = pings_unq_trip %>% st_transform(3857),
-                   aes(color = journeyCodeUnq),
+  ggplot2::geom_point(data = pings_unq_trip_pnt,# %>%  filter(journeyCode == "0751"),
+                   aes(#group = journeyCodeUnq, 
+                     # color = dist_m_rank),
+                     x = x,
+                     y = y,
+                     color = journeyCodeUnq),
                    #colour = pal[2],
-                   linewidth = NA,
+                   #linewidth = NA,
                    size = 4,
                    alpha = 0.8) +
-  scale_colour_manual(values=rep(pal,10))
+  scale_colour_manual(values=rep(pal_bright[1:6],10)) #+
+#facet_grid(rows = ~journeyCodeUnq)
+# scale_color_binned(palette = pal_rainbow[2:7])
+
+
+
 
 pings_anim <- pings_anim +
-  transition_states(time, transition_length = 1, state_length = 1) +
-  shadow_wake(0.9, size = 1, alpha = 0.2) +
-  labs( subtitle = "Time: {frame_along}" ) 
+  #transition_states(lubridate::as_datetime(time), transition_length = 1, state_length = 1) +
+  transition_components(lubridate::as_datetime(time) ) +
+  #transition_manual(lubridate::as_datetime(time) ) +
+  #transition_time(lubridate::as_datetime(time)) +
+  shadow_wake(0.03, size = 1, alpha = 0.4) +
+  labs(#title = "pings on 1 route", 
+       caption = "Time: {format(frame_time, '%H:%M')}") +
+  theme(#plot.title = element_text(hjust = 1, vjust = -10),
+        plot.caption = element_text(hjust = 0, vjust = 15, size = 20, face = "bold", colour = "#888"))
+
+  # 
+  # labs(title = "Time: {format(frame_time, '%H:%M')}") +
+  # theme(plot.title = element_text(hjust = 1, vjust = -10))
   
   #transition_time(time = time) +
   #shadow_mark(past = TRUE)
 
-animate( pings_anim, fps = 10, nframes = 30, duration = 10)
+animate( pings_anim, 
+         fps = 20, 
+        # nframes = 30, 
+         duration = 10)
   
-anim_save(file = "gif/pings_anim_multi3.gif",
+anim_save(file = "gif/pings_anim_multi4.gif",
           plot = get_last_plot(),
           dpi = 320,
           width = 12,
