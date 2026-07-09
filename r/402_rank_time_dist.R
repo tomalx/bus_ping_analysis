@@ -84,16 +84,53 @@ pings <- pings %>%
 
 
 
-#st_length(route_eg_1$geometry %>% st_transform(27700))
+#### in and out pings #######
 
-#### split route into segments
-#distance = units::set_units(1, degrees)
-#u = units::set_units(seq(0, 10000, 500), metres)
-#points <- st_line_interpolate(route_eg_1$geometry %>% st_transform(27700) , u, normalized = FALSE)
-#points <- points %>% st_transform(4326)
+pings_0 <- 
+  ping_snapper(pings = bod_eg, #%>% slice_sample(n = ping_sample_n), 
+               dir_lookup = in_out_lookup, 
+               route_shape = dc_routes,
+               dir = 0)
 
-# leaflet() %>% 
-#   #addTiles() %>%
-#   addProviderTiles("CartoDB.Positron") %>% 
-#   addCircles(data = points, color = "#882255") %>% 
-#   addPolylines(data = route_eg_1, color = "#66aaaa")
+pings_1 <-
+  ping_snapper(pings = bod_eg, #%>% slice_sample(n = ping_sample_n), 
+               dir_lookup = in_out_lookup, 
+               route_shape = dc_routes,
+               dir = 1)
+
+pings_0 <- pings_0 %>%
+  #group_by(journeyCode, day, month) %>% 
+  mutate(dist_m = route_distance_calc(., routes = dc_routes, longest_stop_seq = longest_stop_seq, density = 0.5))
+
+pings_1 <- pings_1 %>%
+  #group_by(journeyCode, day, month) %>% 
+  mutate(dist_m = route_distance_calc(., routes = dc_routes, longest_stop_seq = longest_stop_seq, density = 0.5))
+
+
+
+
+pings <- rbind(pings_0,pings_1)
+
+pings <- pings %>% unique_trip_OD()
+#glimpse(test_pings)
+
+
+pings <- pings %>% 
+  group_by(journeyCode, day, month) %>% 
+  # normalise time to start of journey
+  mutate(time_trip = time - min(time)) %>% 
+  arrange(dist_m) %>% 
+  mutate(dist_m_rank = row_number()) %>% 
+  arrange(time_trip) %>% 
+  mutate(time_trip_rank = row_number())
+
+unq_od_names <- pings$od_name %>% unique()
+unq_od_names
+#test_pings %>% st_drop_geometry() %>% count(od_name)
+#test_pings$directionRef %>% unique()
+# select od_name
+unq_od_names <- unq_od_names[1]
+pings <- pings %>% filter(od_name %in% unq_od_names)
+
+pings <- pings %>% 
+  mutate(journeyCodeUnq = paste0(journeyCode,"-",vehicleId))

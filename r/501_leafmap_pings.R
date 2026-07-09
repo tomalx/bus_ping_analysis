@@ -3,8 +3,13 @@ library(leaflet)
 library(RColorBrewer)
 
 palette_fun <- khroma::color("bright")
-pal <- palette_fun(7)
-pal[1:7]
+pal_bright <- palette_fun(7)
+pal_bright[1:7]
+
+palette_fun <- khroma::color("smoothrainbow")
+pal_rainbow <- palette_fun(7)
+pal_rainbow[1:7]
+khroma::plot_scheme_colorblind(pal_rainbow)
 
 map <-  leaflet::leaflet() %>%
   addTiles(group = "OSM") %>% 
