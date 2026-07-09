@@ -25,7 +25,7 @@ pings_unq_trip_id <- pings %>%
   filter(hour(time) == 8) %>% 
   pull(journeyCodeUnq) %>% 
   unique() %>% 
-  sample(4)
+  sample(2)
 
 pings_unq_trip <- pings %>% 
   filter(journeyCodeUnq %in% pings_unq_trip_id)
@@ -133,7 +133,9 @@ ggsave(filename = glue::glue("qmd/pings_unq_route_focus.jpeg"),
 
 
 # use geom_point instead of geom_sf
-pings_unq_trip_pnt <- pings_unq_trip %>% ungroup() %>% 
+pings_unq_trip_pnt <- ping_speed(pings = pings_unq_trip) 
+
+pings_unq_trip_pnt <- pings_unq_trip_pnt %>% ungroup() %>% 
   mutate(x = st_coordinates(pings_unq_trip)[,1]) %>% 
   mutate(y = st_coordinates(pings_unq_trip)[,2]) %>% 
   st_drop_geometry()
@@ -145,15 +147,16 @@ pings_anim <-
                      # color = dist_m_rank),
                      x = x,
                      y = y,
-                     color = journeyCodeUnq),
+                     color = ping_speed),
                    #colour = pal[2],
                    #linewidth = NA,
-                   size = 4,
+                   size = 2,
                    alpha = 0.8) +
-  scale_colour_manual(values=rep(pal_bright[1:6],10)) #+
-#facet_grid(rows = ~journeyCodeUnq)
+#  scale_colour_manual(values=rep(pal_bright[1:6],10)) #+
+facet_grid(rows = ~journeyCodeUnq) +
 # scale_color_binned(palette = pal_rainbow[2:7])
-
+#scale_color_gradientn(colours = pal_rainbow[2:7], limits = c(0,18))
+scale_color_gradient(limits = c(0,18), low = "red", high = "green")
 
 
 
