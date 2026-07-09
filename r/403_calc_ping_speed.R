@@ -12,7 +12,9 @@ ping_speed <- function(pings = pings){
     mutate(prev_ping_time = time_trip - lag(time_trip)) %>% 
     mutate(ping_speed = (dist_m - lag(dist_m)) / 
              (as.numeric(time_trip) - lag(as.numeric(time_trip))) ) %>% 
-    mutate(across(ping_speed, ~ replace(., is.nan(.), 0)))
+    mutate(across(ping_speed, ~ replace(., is.nan(.), 0))) %>%
+    mutate(across(ping_speed, ~ replace(., . < 0, 0)))
+    
   
   return(pings_new)
 }
