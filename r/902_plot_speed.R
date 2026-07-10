@@ -40,12 +40,12 @@ pings_plot <- pings_plot %>%
   mutate(bin_speed = sum(ping_speed)/n()) %>% 
   ungroup()
 
-pings_plot$dist_m_bin <- format(pings_plot$dist_m_bin, scientific = FALSE)
 
 pings_plot %>% ggplot(
-  aes(x = dist_m_bin, y = ping_speed, group = journeyCodeUnq)
+  aes(x = dist_m_bin, y = bin_speed) #, group = journeyCodeUnq)
 ) +
-  geom_point(alpha = 0.1, stroke = NA, size = 1)
+  geom_col(alpha = 0.1, stroke = NA, size = 1) +
+  theme_minimal()
 
 
 ## x binned
@@ -64,4 +64,13 @@ pings_plot %>% ggplot(
   geom_line(alpha = 0.5, stroke = NA, size = 0.1, color = "#ababab") +
   theme_minimal() +
   geom_vline(xintercept = stops_1$dist_m)
+
+
+# ideas
+# make a bin_route function which splits the route line dc_route shape into
+# segments which are the same size as the dist_m bins
+# this can then be mapped chloropleth rout line map broken every 50m - 
+# coloured by avg speed, speed variance, iqr
+
+
 
