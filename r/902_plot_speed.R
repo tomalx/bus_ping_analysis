@@ -1,6 +1,7 @@
 ## plot ping speed
 
 pings_plot <- pings %>% 
+  ping_filter() %>% 
   filter(direction_id == 0) %>% 
  # filter(stringr::str_starts(journeyCode, pattern = "08")) %>% 
   ping_speed() %>% 
@@ -29,6 +30,6 @@ pings_plot %>% ggplot(
       )
 ) +
   geom_line(alpha = 0.5, stroke = NA, size = 0.1, color = "#ababab") +
-  theme_void() +
+  theme_minimal() +
   geom_vline(xintercept = c(1000))
 
