@@ -54,6 +54,7 @@ rds/bod*.rds
 parquet/
 html/
 qmd/
+gif/
 explore_pings/
 todo.txt
 explainer
