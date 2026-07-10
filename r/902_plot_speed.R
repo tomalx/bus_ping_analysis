@@ -5,7 +5,7 @@ pings_plot <- pings %>%
  # filter(stringr::str_starts(journeyCode, pattern = "08")) %>% 
   ping_speed() %>% 
   # mutate(dist_m_bin =  cut(dist_m, breaks = 2)) 
-  mutate(dist_m_bin = ntile(dist_m, n = 20))
+  mutate(dist_m_bin = ntile(dist_m, n = 200))
 
 pings_plot$dist_m_bin <- format(pings_plot$dist_m_bin, scientific = FALSE)
 
@@ -21,3 +21,14 @@ pings_plot %>% ggplot(
 ) +
   geom_boxplot()# +
   #scale_x_binned()
+
+pings_plot %>% ggplot(
+  aes(x = dist_m, 
+      y = as.numeric(time_trip) , 
+      group = journeyCodeUnq
+      )
+) +
+  geom_line(alpha = 0.5, stroke = NA, size = 0.1, color = "#ababab") +
+  theme_void() +
+  geom_vline(xintercept = c(1000))
+
