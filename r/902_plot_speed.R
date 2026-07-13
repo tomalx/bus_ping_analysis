@@ -21,11 +21,17 @@ stops_1 <- stop_seq %>%
 
 pings
 
-dist_m_bin_size <- 50 ## size in metres
+dist_m_bin_size <- 400 ## size in metres
 
 
 pings_plot <- pings %>% 
-  ping_filter(direction = 1, sample_jnycode = 10) %>% 
+  ping_filter(direction = 1, 
+              hr_of_day = c(0:23) , 
+              sample_jnycode = 25) %>%
+  group_by(journeyCodeUnq) %>% 
+  mutate(n = n()) %>% 
+  ungroup() %>% 
+  filter(n > 200) %>% 
 
  # filter(stringr::str_starts(journeyCode, pattern = "08")) %>% 
   ping_speed() %>% 
@@ -44,7 +50,7 @@ pings_plot <- pings_plot %>%
 pings_plot %>% ggplot(
   aes(x = dist_m_bin, y = bin_speed) #, group = journeyCodeUnq)
 ) +
-  geom_col(alpha = 0.1, stroke = NA, size = 1) +
+  geom_line(alpha = 0.1, stroke = NA, size = 1) +
   theme_minimal()
 
 
@@ -61,9 +67,9 @@ pings_plot %>% ggplot(
       group = journeyCodeUnq
       )
 ) +
-  geom_line(alpha = 0.5, stroke = NA, size = 0.1, color = "#ababab") +
-  theme_minimal() +
-  geom_vline(xintercept = stops_1$dist_m)
+  geom_line(alpha = 1, size = 0.1, color = "#444444") +
+  theme_classic() +
+  geom_vline(xintercept = stops_1$dist_m, alpha = 0.5, size = 0.5, color = "#ababab")
 
 
 # ideas
