@@ -32,7 +32,7 @@ seg_breaks <- stops_0$dist_m
 seg_names <- route_stop_split$seg_name
 
 
-pings_plot <- pings %>% 
+pings_filtered <- pings %>% 
   ping_filter(direction = 0, 
               hr_of_day = c(0:23) , 
               sample_jnycode = 25) %>%
@@ -53,7 +53,30 @@ pings_plot <- pings %>%
   #remove rows with NA values
   filter(!is.na(dist_m_bin))
 
-pings_plot <- pings_plot %>% 
+
+#speed palette
+incandescent <- khroma::color("incandescent")
+incandescent(6)[6:1]
+pal_speed <- colorNumeric(palette = incandescent(6)[6:1], domain = 0:10)
+
+####
+# join pings filtered to geometry of route_stop_split - join by seg_name = dist_m_bin
+pings_seg_speed <- pings_filtered %>%
+  st_drop_geometry() %>%
+  filter(!is.na(ping_speed)) %>% 
+  group_by(dist_m_bin) %>% 
+  summarise(speed_50 = mean(ping_speed)) %>% 
+  left_join(route_stop_split, by = c("dist_m_bin" = "seg_name")) %>% 
+  st_as_sf(crs = 27700) %>% 
+  st_transform(4326)
+
+leaflet() %>% 
+  addProviderTiles("CartoDB.Positron") %>% 
+  addPolylines(data = pings_seg_speed, color = ~pal_speed(speed_50), opacity = 1 )
+
+
+
+pings_plot <- pings_filtered %>% 
   group_by(journeyCodeUnq, dist_m_bin) %>% 
   mutate(sample_size = n()) %>%
   mutate(bin_speed = sum(ping_speed)/n()) %>% 
