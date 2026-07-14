@@ -26,11 +26,11 @@ split_at_stop <- function(stop_seq = stop_seq , routes,
   # set crs to WGS84
   route <- st_geometry(line_sf)[[1]] #%>% stplanr::line_segment1(segment_length = c(1000,5000,2000))
   
-  pts <- route %>% st_line_sample(sample = c(0.1,0.2,0.3,0.9))  
+  #pts <- route %>% st_line_sample(sample = c(0.1,0.2,0.3,0.9))  
     #st_cast("POINT")
   
-  split_route <- st_collection_extract(lwgeom::st_split(route, st_union(pts)),
-                                    "LINESTRING")
+  #split_route <- st_collection_extract(lwgeom::st_split(route, st_union(pts)),
+  #                                  "LINESTRING")
   
   
   breaks <- c(0,0.1,0.2,0.9,1)
@@ -43,7 +43,7 @@ split_at_stop <- function(stop_seq = stop_seq , routes,
     crs = st_crs(route)
   )
   
-  length(segments)
+ # length(segments)
   
   # Sample points densely along the line to serve as reference path
  # sampled_points <- st_line_sample(route, density = density) %>% st_cast("POINT")
@@ -58,7 +58,7 @@ split_at_stop <- function(stop_seq = stop_seq , routes,
   # Assign distance based on nearest sampled point
 #  distance_along <- dist_along_line[nearest_index]
   
-  return(split_route)
+  return(segments)
 }
 
 my_route <- split_at_stop(stop_seq = stops_0,
@@ -68,10 +68,10 @@ my_route <- split_at_stop(stop_seq = stops_0,
 my_route <- st_cast(my_route, "LINESTRING")
 
 leaflet() %>% leaflet::addProviderTiles("CartoDB.Positron") %>% 
-  addPolylines(st_geometry(my_route) %>% st_transform(4326))
+  addPolylines(sf::st_as_sf(my_route, crs = 27700) %>% st_transform(4326))
 
 plot(my_route)
 plot(sf::st_geometry(my_route), col = c(1,2,5), lwd = 3)
 
-plot(sf::st_geometry(segments), col = c(1,2,5), lwd = 3)
+#plot(sf::st_geometry(segments), col = c(1,2,5), lwd = 3)
 
