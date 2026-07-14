@@ -23,17 +23,9 @@ split_at_stop <- function(stop_seq = stop_seq , routes,
   line_sf <- st_transform(line_sf, 27700)
   
   # Get line geometry
-  # set crs to WGS84
   route <- st_geometry(line_sf)[[1]] #%>% stplanr::line_segment1(segment_length = c(1000,5000,2000))
   
-  #pts <- route %>% st_line_sample(sample = c(0.1,0.2,0.3,0.9))  
-    #st_cast("POINT")
-  
-  #split_route <- st_collection_extract(lwgeom::st_split(route, st_union(pts)),
-  #                                  "LINESTRING")
-  
-  
-  breaks <- c(0,0.1,0.2,0.9,1)
+  breaks <- stop_seq$dist_m/max(stop_seq$dist_m)
   
   # create segments
   segments <- st_sfc(
@@ -43,22 +35,20 @@ split_at_stop <- function(stop_seq = stop_seq , routes,
     crs = st_crs(route)
   )
   
- # length(segments)
+  df <- data.frame(start_stop = stop_seq$stop_name[1:nrow(stop_seq)-1],
+                   end_stop = stop_seq$stop_name[2:nrow(stop_seq)],
+                   dist_m_start = stop_seq$dist_m[1:nrow(stop_seq)-1],
+                   dist_m_end = stop_seq$dist_m[2:nrow(stop_seq)])
+  df <- df %>% 
+    mutate(seg_name = paste0(word(start_stop, start = 1, sep = ","),
+                             " - ",
+                             word(end_stop, start = 1, sep = ",")
+                             )) %>% 
+    mutate(seg_length = dist_m_end - dist_m_start)
   
-  # Sample points densely along the line to serve as reference path
- # sampled_points <- st_line_sample(route, density = density) %>% st_cast("POINT")
+  sf_obj <- st_sf(df, geom = segments)
   
-  # Snap each point to the nearest sampled point on the line
-#  nearest_index <- st_nearest_feature(points_sf, sampled_points)
-  
-  # Calculate cumulative distance along the line for sampled points
-#  dist_along_line <- c(0, cumsum(st_distance(sampled_points[-length(sampled_points)],
-#                                             sampled_points[-1], by_element = TRUE)))
-  
-  # Assign distance based on nearest sampled point
-#  distance_along <- dist_along_line[nearest_index]
-  
-  return(segments)
+  return(sf_obj)
 }
 
 my_route <- split_at_stop(stop_seq = stops_0,
@@ -67,8 +57,8 @@ my_route <- split_at_stop(stop_seq = stops_0,
                           )
 my_route <- st_cast(my_route, "LINESTRING")
 
-leaflet() %>% leaflet::addProviderTiles("CartoDB.Positron") %>% 
-  addPolylines(sf::st_as_sf(my_route, crs = 27700) %>% st_transform(4326))
+leaflet::leaflet() %>% leaflet::addProviderTiles("CartoDB.Positron") %>% 
+  leaflet::addPolylines(data = my_route %>% st_set_crs(27700) %>% st_transform(4326))
 
 plot(my_route)
 plot(sf::st_geometry(my_route), col = c(1,2,5), lwd = 3)
