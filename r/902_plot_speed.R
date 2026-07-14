@@ -28,8 +28,8 @@ pings
 dist_m_bin_size <- 400 ## size in metres
 
 # breaks by stop to stop distance
-seg_breaks <- route_stop_split$dist_m_start
-seg_names <- stops_0$stop_name[2:length(stops_0$stop_name)]
+seg_breaks <- stops_0$dist_m
+seg_names <- route_stop_split$seg_name
 
 
 pings_plot <- pings %>% 
@@ -47,7 +47,7 @@ pings_plot <- pings %>%
   mutate(dist_m_bin = cut(dist_m,
                           breaks = seg_breaks,
                           labels = seg_names
-                          #breaks = c(seq(0, max(dist_m), dist_m_bin_size)),   ### Breaks by equal size (option)
+                          #breaks = c(seq(0, max(dist_m), dist_m_bin_size)), 
                           #labels = c(seq(dist_m_bin_size, max(dist_m), dist_m_bin_size)) 
                           )) %>% 
   #remove rows with NA values
