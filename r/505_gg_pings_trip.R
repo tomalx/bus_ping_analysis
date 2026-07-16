@@ -74,7 +74,7 @@ route_basemap <-
 
 route_basemap +
   ggplot2::geom_sf(data = pings_unq_trip %>% st_transform(3857),
-                   colour = pal[2],
+                   colour = pal_bright[2],
                    linewidth = NA,
                    size = 0.5,
                    alpha = 0.4)
@@ -86,7 +86,7 @@ ggplot2::geom_sf(data = pings_unq_trip %>% st_transform(3857),# %>% filter(journ
                  linewidth = NA,
                  size = 1,
                  alpha = 0.6) +
-  scale_colour_manual(values=rep(pal[1:6],10)) +
+  scale_colour_manual(values=rep(pal_bright[1:6],10)) +
   facet_grid(rows = ~journeyCodeUnq)
 
 ggsave(filename = glue::glue("qmd/pings_unq_route_focus.jpeg"),
@@ -100,11 +100,11 @@ ggsave(filename = glue::glue("qmd/pings_unq_route_focus.jpeg"),
 ### map - one trip only
 route_basemap +
   ggplot2::geom_sf(data = pings_unq_trip %>% st_transform(3857),
-                   colour = pal[2],
+                   colour = pal_bright[2],
                    linewidth = NA,
                    size = 1,
                    alpha = 0.8) +
-  labs(title = "pings on 1 route", caption = "07:28") +
+  labs(title = "pings on X39 route", caption = "08:00") +
   theme(plot.title = element_text(hjust = 1, vjust = -10),
         plot.caption = element_text(hjust = 0, vjust = 15, size = 20, face = "bold", colour = "#888"))
 

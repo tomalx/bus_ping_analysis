@@ -130,7 +130,7 @@ unq_od_names
 #test_pings$directionRef %>% unique()
 # select od_name
 unq_od_names <- unq_od_names[1]
-pings <- pings %>% filter(od_name %in% unq_od_names)
+# pings <- pings %>% filter(od_name %in% unq_od_names) # possibly remove???
 
 pings <- pings %>% 
   mutate(journeyCodeUnq = paste0(journeyCode,"-",vehicleId))

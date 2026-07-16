@@ -19,7 +19,7 @@ map <-  leaflet::leaflet() %>%
 for(i in 1:nrow(dc_routes)){
   map <- map %>% 
     leaflet::addPolylines(data = dc_routes[i,],
-                          color = pal[i], 
+                          color = pal_bright[i], 
                           stroke = TRUE,
                           weight = 10,
                           popup = paste0("direction: ",dc_routes$direction_id[i], " <br>", 
@@ -67,7 +67,7 @@ for(i in 1:nrow(dc_routes)){
 map <- map %>% addCircles(data = pings, # %>% filter(direction_id == 0),
                           radius = 0.8,
                           weight = 0.5,
-                          color = pal[2],
+                          color = pal_bright[2],
                           fillOpacity = 0,
                           popup = ~paste0(time, "<br>", 
                                           directionRef, "<br>"
@@ -84,17 +84,22 @@ map <- map %>% addCircles(data = pings, # %>% filter(direction_id == 0),
 #                           ),
 #                           group = "snapped points in")
 
-map <- map %>% leaflet.extras::addHeatmap(data = pings, #%>% filter(direction_id == 0) ,
-                                          max = 0.8,  # default 1.0
-                                          radius = 10, #default 25
-                                          blur =  20, # default 15 (1=no blur)
-                                          group = "heatmap")
-
 map <- map %>% leaflet.extras::addHeatmap(data = pings %>% filter(direction_id == 0) ,
                                           max = 0.8,  # default 1.0
                                           radius = 10, #default 25
                                           blur =  20, # default 15 (1=no blur)
+                                          group = "heatmap out")
+
+map <- map %>% leaflet.extras::addHeatmap(data = pings %>% filter(direction_id == 1) ,
+                                          max = 0.8,  # default 1.0
+                                          radius = 10, #default 25
+                                          blur =  20, # default 15 (1=no blur)
                                           group = "heatmap in")
+
+map <- map %>% addPolylines(data = pings_seg_speed, 
+                            color = ~pal_speed(speed_50), 
+                            opacity = 1,
+                            group = "")
 
 # map <- map %>% leaflet.extras::addHeatmap(data = bod_snap_0_am ,
 #                                           max = 0.8,  # default 1.0
@@ -109,7 +114,7 @@ map <- map %>% leaflet.extras::addHeatmap(data = pings %>% filter(direction_id =
 #                                           group = "heatmap in am")
 
 map <- map  %>% addLayersControl(baseGroups = c("OSM", "carto"),
-                          overlayGroups = c(#as.character(1:nrow(dc_routes)),
+                          overlayGroups = c(as.character(1:nrow(dc_routes)),
                                            # "nearest lines in",
                                            # "nearest lines out",
                                            # "original points in",
@@ -117,7 +122,7 @@ map <- map  %>% addLayersControl(baseGroups = c("OSM", "carto"),
                                            # "snapped points in",
                                             "snapped points",
                                             "heatmap in",
-                                            "heatmap"
+                                            "heatmap out"
                                            # "heatmap in am",
                                            # "heatmap out am"
                                             
