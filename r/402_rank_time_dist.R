@@ -71,13 +71,13 @@ pings <- pings %>%
   arrange(time_trip) %>% 
   mutate(time_trip_rank = row_number())
 
-unq_od_names <- pings$od_name %>% unique()
-unq_od_names
+#unq_od_names <- pings$od_name %>% unique()
+#unq_od_names
 #test_pings %>% st_drop_geometry() %>% count(od_name)
 #test_pings$directionRef %>% unique()
 # select od_name
-unq_od_names <- unq_od_names[1]
-pings <- pings %>% filter(od_name %in% unq_od_names)
+#unq_od_names <- unq_od_names[1]
+#pings <- pings %>% filter(od_name %in% unq_od_names)
 
 pings <- pings %>% 
   mutate(journeyCodeUnq = paste0(journeyCode,"-",vehicleId))
@@ -124,12 +124,12 @@ pings <- pings %>%
   arrange(time_trip) %>% 
   mutate(time_trip_rank = row_number())
 
-unq_od_names <- pings$od_name %>% unique()
-unq_od_names
+#unq_od_names <- pings$od_name %>% unique()
+#unq_od_names
 #test_pings %>% st_drop_geometry() %>% count(od_name)
 #test_pings$directionRef %>% unique()
 # select od_name
-unq_od_names <- unq_od_names[1]
+#unq_od_names <- unq_od_names[1]
 # pings <- pings %>% filter(od_name %in% unq_od_names) # possibly remove???
 
 pings <- pings %>% 
