@@ -58,6 +58,12 @@ longest_stop_seq <-
   group_by(direction_id) %>% 
   filter(n == max(n))
 
+# when 2+ shape_id with same number of stops
+longest_stop_seq <- 
+  longest_stop_seq %>% 
+  group_by(direction_id) %>% 
+  summarise(shape_id = first(shape_id))
+
 stop_seq <-
   stop_seq %>% 
   filter(shape_id %in% longest_stop_seq$shape_id)
