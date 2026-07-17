@@ -99,7 +99,7 @@ map <- map %>% leaflet.extras::addHeatmap(data = pings %>% filter(direction_id =
 map <- map %>% addPolylines(data = pings_seg_speed, 
                             color = ~pal_speed(speed_50), 
                             opacity = 1,
-                            group = "")
+                            group = "speed")
 
 # map <- map %>% leaflet.extras::addHeatmap(data = bod_snap_0_am ,
 #                                           max = 0.8,  # default 1.0
@@ -122,7 +122,8 @@ map <- map  %>% addLayersControl(baseGroups = c("OSM", "carto"),
                                            # "snapped points in",
                                             "snapped points",
                                             "heatmap in",
-                                            "heatmap out"
+                                            "heatmap out",
+                                           "speed"
                                            # "heatmap in am",
                                            # "heatmap out am"
                                             

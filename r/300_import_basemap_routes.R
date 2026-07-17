@@ -37,4 +37,4 @@ dc_routes <- dc_routes %>% #filter(direction_id == 1) %>%
   st_as_sf(crs = 27700) %>% 
   st_transform(4326)
 
-rm(bus_loc_parquet, parquet_month_dir, parquet_path, route_number, unique_service_code)
+rm(bus_loc_parquet, parquet_month_dir, parquet_path, unique_service_code)
