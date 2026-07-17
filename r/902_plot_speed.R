@@ -65,7 +65,9 @@ pings_seg_speed <- pings_filtered %>%
   st_drop_geometry() %>%
   filter(!is.na(ping_speed)) %>% 
   group_by(dist_m_bin) %>% 
-  summarise(speed_50 = mean(ping_speed)) %>% 
+  summarise(speed_50 = mean(ping_speed),
+            speed_iqr = IQR(ping_speed),
+            speed_sd = sd(ping_speed)) %>% 
   left_join(route_stop_split, by = c("dist_m_bin" = "seg_name")) %>% 
   st_as_sf(crs = 27700) %>% 
   st_transform(4326)
