@@ -11,7 +11,34 @@ split_every_x_metres <- function(routes,
   longest_shape <- longest_stop_seq %>% filter(direction_id %in% dir) %>% pull(shape_id)
   line_sf <- routes %>% filter(shape_id %in% longest_shape)
   
+  line_sf <- st_transform(line_sf, 27700)
+  # Get line geometry
+  route <- st_geometry(line_sf)[[1]]
   
+  num_breaks <- st_length(route) %/% dist# %/% integer divison operator
+  
+  breaks <- c(0:num_breaks * dist ,  st_length(route) )
+  
+  # create segments
+  segments <- st_sfc(
+    lapply(seq_len(length(breaks) - 1), function(i) {
+      lwgeom::st_linesubstring(route, breaks[i], breaks[i + 1])
+    }),
+    crs = st_crs(route)
+  )
+  
+  df <- data.frame(start_seg = c(0,breaks, ),
+                   end_stop = stop_seq$stop_name[2:nrow(stop_seq)],
+                   dist_m_start = stop_seq$dist_m[1:nrow(stop_seq)-1],
+                   dist_m_end = stop_seq$dist_m[2:nrow(stop_seq)])
+  df <- df %>% 
+    mutate(seg_name = paste0(word(start_stop, start = 1, sep = ","),
+                             " - ",
+                             word(end_stop, start = 1, sep = ",")
+    )) %>% 
+    mutate(seg_length = dist_m_end - dist_m_start)
+  
+  return(segments)
   
 }
 
