@@ -37,19 +37,19 @@ pings_filtered <- pings %>%
               hr_of_day = c(0:23) #, 
              # sample_jnycode = 25
              ) %>%
-  group_by(journeyCodeUnq) %>% 
+  group_by(journeyCodeUnq,day) %>% 
   mutate(n = n()) %>% 
   ungroup() %>% 
-  filter(n > 200) %>% 
+  filter(n > 80) %>% 
 
  # filter(stringr::str_starts(journeyCode, pattern = "08")) %>% 
   ping_speed() %>% 
   # mutate(dist_m_bin =  cut(dist_m, breaks = 2)) 
   mutate(dist_m_bin = cut(dist_m,
-                          breaks = seg_breaks,
-                          labels = seg_names
-                          #breaks = c(seq(0, max(dist_m), dist_m_bin_size)), 
-                          #labels = c(seq(dist_m_bin_size, max(dist_m), dist_m_bin_size)) 
+                          #breaks = seg_breaks,
+                          #labels = seg_names
+                          breaks = c(seq(0, max(dist_m), dist_m_bin_size)), 
+                          labels = c(seq(dist_m_bin_size, max(dist_m), dist_m_bin_size)) 
                           )) %>% 
   #remove rows with NA values
   filter(!is.na(dist_m_bin))

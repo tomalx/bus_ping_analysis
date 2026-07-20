@@ -12,7 +12,7 @@ pal_rainbow[1:7]
 khroma::plot_scheme_colorblind(pal_rainbow)
 
 map <-  leaflet::leaflet() %>%
-  addTiles(group = "OSM") %>% 
+  # addTiles(group = "OSM") %>% 
   leaflet::addProviderTiles("CartoDB.Positron", group = "carto")
 
 
@@ -102,12 +102,12 @@ map <- map %>% addPolylines(data = pings_seg_speed,
                             group = "speed")
 
 map <- map %>% addPolylines(data = pings_seg_speed, 
-                            color = ~pal_speed(speed_iqr), 
+                            color = ~pal_iqr(speed_iqr), 
                             opacity = 1,
                             group = "iqr")
 
 map <- map %>% addPolylines(data = pings_seg_speed, 
-                            color = ~pal_speed(speed_sd), 
+                            color = ~pal_sd(speed_sd), 
                             opacity = 1,
                             group = "sd")
 
@@ -123,8 +123,11 @@ map <- map %>% addPolylines(data = pings_seg_speed,
 #                                           blur =  20, # default 15 (1=no blur)
 #                                           group = "heatmap in am")
 
-map <- map  %>% addLayersControl(baseGroups = c("OSM", "carto"),
-                          overlayGroups = c(
+map <- map  %>% addLayersControl(
+                          baseGroups = 
+                                   # c("OSM", "carto"),
+                         # overlayGroups =
+                            c(
                             #as.character(1:nrow(dc_routes)),
                                            # "nearest lines in",
                                            # "nearest lines out",
@@ -133,7 +136,7 @@ map <- map  %>% addLayersControl(baseGroups = c("OSM", "carto"),
                                            # "snapped points in",
                                             "snapped points",
                                             "heatmap in",
-                                            "heatmap out",
+                                           # "heatmap out",
                                            "speed",
                                            "iqr",
                                            "sd"
@@ -144,4 +147,4 @@ map <- map  %>% addLayersControl(baseGroups = c("OSM", "carto"),
                           options = layersControlOptions(collapsed = FALSE))
 
 map %>% hideGroup(c(as.character(1:nrow(dc_routes))))
-map %>% addLegend()
+map %>% addLegend("bottomright", pal = pal_speed, values = 0:12 , title = "Average Speed (m/sec)", opacity = 1, group = "speed")
