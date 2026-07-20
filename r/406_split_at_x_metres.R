@@ -27,16 +27,13 @@ split_every_x_metres <- function(routes,
     crs = st_crs(route)
   )
   
-  df <- data.frame(start_seg = c(0,breaks, ),
-                   end_stop = stop_seq$stop_name[2:nrow(stop_seq)],
-                   dist_m_start = stop_seq$dist_m[1:nrow(stop_seq)-1],
-                   dist_m_end = stop_seq$dist_m[2:nrow(stop_seq)])
+  df <- data.frame(start_seg = head(breaks, -1),
+                   end_seg = breaks[-1] )
   df <- df %>% 
-    mutate(seg_name = paste0(word(start_stop, start = 1, sep = ","),
+    mutate(seg_name = paste0(start_seg,
                              " - ",
-                             word(end_stop, start = 1, sep = ",")
-    )) %>% 
-    mutate(seg_length = dist_m_end - dist_m_start)
+                             round(end_seg,0)
+    )) 
   
   return(segments)
   
