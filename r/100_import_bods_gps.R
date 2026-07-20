@@ -28,7 +28,7 @@ route_number <- "X39"
 
 setwd("bus_ping_analysis")
   
-parquet_month_dir <- "20266" # YYYYM / YYYYMM
+parquet_month_dir <- "202606" # YYYYM / YYYYMM
 
 parquet_path <- "parquet"
 
@@ -40,7 +40,8 @@ bod_loc_query <- bus_loc_parquet %>%
   #filter(year_month_day %in% c("2026615","2026616","2026617","2026618","2026619")) %>% # mon - fri
  # filter(year_month_day %in% c("2026616","2026617","2026618")) %>% # tue,wed,thu
   #filter(year_month_day %in% c("202662","202663","202664","202665","202668","202669","2026610")) %>% 
- filter(year_month_day == "2026618") %>% 
+# filter(year_month_day == "202549") %>%
+  filter(month == 4) %>% 
  filter(lineRef == route_number) #%>%
  # group_by(time,destination,journeyCode) %>% 
   #summarise(count = n())
