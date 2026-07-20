@@ -18,11 +18,12 @@ split_every_x_metres <- function(routes,
   num_breaks <- st_length(route) %/% dist# %/% integer divison operator
   
   breaks <- c(0:num_breaks * dist ,  st_length(route) )
+  breaks_norm <- breaks/st_length(route)
   
   # create segments
   segments <- st_sfc(
-    lapply(seq_len(length(breaks) - 1), function(i) {
-      lwgeom::st_linesubstring(route, breaks[i], breaks[i + 1])
+    lapply(seq_len(length(breaks_norm) - 1), function(i) {
+      lwgeom::st_linesubstring(route, breaks_norm[i], breaks_norm[i + 1])
     }),
     crs = st_crs(route)
   )
@@ -35,7 +36,9 @@ split_every_x_metres <- function(routes,
                              round(end_seg,0)
     )) 
   
-  return(segments)
+  sf_obj <- st_sf(df, geom = segments)
+  
+  return(sf_obj)
   
 }
 
