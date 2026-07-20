@@ -23,7 +23,7 @@ library(arrow)
 library(dplyr)
 library(glue)
 
-route_number <- "X39"
+route_number <- "6"
 
 
 setwd("bus_ping_analysis")
@@ -41,7 +41,7 @@ bod_loc_query <- bus_loc_parquet %>%
  # filter(year_month_day %in% c("2026616","2026617","2026618")) %>% # tue,wed,thu
   #filter(year_month_day %in% c("202662","202663","202664","202665","202668","202669","2026610")) %>% 
 # filter(year_month_day == "202549") %>%
-  filter(month == 4) %>% 
+  filter(day %in% c(21,22,23,24,25)) %>% 
  filter(lineRef == route_number) #%>%
  # group_by(time,destination,journeyCode) %>% 
   #summarise(count = n())

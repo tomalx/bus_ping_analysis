@@ -14,7 +14,8 @@ tic(msg="filter to remove headings rows and mutate route_destination")
 bod_eg <- bod_loc_query %>% 
   filter(!lineRef == "lineRef") %>%
   mutate(route_destination = paste0(lineRef,"-",destination)) %>%
-  mutate(route_destination = word(route_destination,1, sep = "__"))
+  mutate(route_destination = word(route_destination,1, sep = "__")) %>% 
+  unique()
 toc()
 
 rm(bod_loc_query) # don't need this anymore?
