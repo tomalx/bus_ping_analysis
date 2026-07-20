@@ -17,7 +17,7 @@ stops_1 <- stop_seq %>%
   #group_by(journeyCode, day, month) %>% 
   mutate(dist_m = route_distance_calc(., routes = dc_routes, longest_stop_seq = longest_stop_seq, density = 0.5))
 
-route_stop_split <- split_at_stop(stop_seq = stops_0,
+route_stop_split <- split_at_stop(stop_seq = stops_1,
                           routes = dc_routes,
                           longest_stop_seq = longest_stop_seq
 )
@@ -28,14 +28,15 @@ pings
 dist_m_bin_size <- 400 ## size in metres
 
 # breaks by stop to stop distance
-seg_breaks <- stops_0$dist_m
+seg_breaks <- stops_1$dist_m
 seg_names <- route_stop_split$seg_name
 
 
 pings_filtered <- pings %>% 
-  ping_filter(direction = 0, 
-              hr_of_day = c(0:23) , 
-              sample_jnycode = 25) %>%
+  ping_filter(direction = 1, 
+              hr_of_day = c(0:23) #, 
+             # sample_jnycode = 25
+             ) %>%
   group_by(journeyCodeUnq) %>% 
   mutate(n = n()) %>% 
   ungroup() %>% 
@@ -57,7 +58,9 @@ pings_filtered <- pings %>%
 #speed palette
 incandescent <- khroma::color("incandescent")
 incandescent(6)[6:1]
-pal_speed <- colorNumeric(palette = incandescent(6)[6:1], domain = 0:10)
+pal_speed <- colorNumeric(palette = incandescent(6)[6:1], domain = 0:12)
+pal_iqr <- colorNumeric(palette = incandescent(6)[1:6], domain = 0:8)
+pal_sd <- colorNumeric(palette = incandescent(6)[1:6], domain = 0:4)
 
 ####
 # join pings filtered to geometry of route_stop_split - join by seg_name = dist_m_bin

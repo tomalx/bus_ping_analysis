@@ -64,7 +64,7 @@ for(i in 1:nrow(dc_routes)){
 #                           ),
 #                           group = "original points in")
 
-map <- map %>% addCircles(data = pings, # %>% filter(direction_id == 0),
+map <- map %>% addCircles(data = pings %>% filter(direction_id == 1),
                           radius = 0.8,
                           weight = 0.5,
                           color = pal_bright[2],
@@ -101,6 +101,16 @@ map <- map %>% addPolylines(data = pings_seg_speed,
                             opacity = 1,
                             group = "speed")
 
+map <- map %>% addPolylines(data = pings_seg_speed, 
+                            color = ~pal_speed(speed_iqr), 
+                            opacity = 1,
+                            group = "iqr")
+
+map <- map %>% addPolylines(data = pings_seg_speed, 
+                            color = ~pal_speed(speed_sd), 
+                            opacity = 1,
+                            group = "sd")
+
 # map <- map %>% leaflet.extras::addHeatmap(data = bod_snap_0_am ,
 #                                           max = 0.8,  # default 1.0
 #                                           radius = 10, #default 25
@@ -114,7 +124,8 @@ map <- map %>% addPolylines(data = pings_seg_speed,
 #                                           group = "heatmap in am")
 
 map <- map  %>% addLayersControl(baseGroups = c("OSM", "carto"),
-                          overlayGroups = c(as.character(1:nrow(dc_routes)),
+                          overlayGroups = c(
+                            #as.character(1:nrow(dc_routes)),
                                            # "nearest lines in",
                                            # "nearest lines out",
                                            # "original points in",
@@ -123,7 +134,9 @@ map <- map  %>% addLayersControl(baseGroups = c("OSM", "carto"),
                                             "snapped points",
                                             "heatmap in",
                                             "heatmap out",
-                                           "speed"
+                                           "speed",
+                                           "iqr",
+                                           "sd"
                                            # "heatmap in am",
                                            # "heatmap out am"
                                             
@@ -131,3 +144,4 @@ map <- map  %>% addLayersControl(baseGroups = c("OSM", "carto"),
                           options = layersControlOptions(collapsed = FALSE))
 
 map %>% hideGroup(c(as.character(1:nrow(dc_routes))))
+map %>% addLegend()
