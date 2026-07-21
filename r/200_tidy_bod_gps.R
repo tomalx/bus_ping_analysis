@@ -31,9 +31,12 @@ bod_eg <- bod_eg %>%
   #filter(ticketMachineServiceCode == "U1" & directionRef == direction) %>%
   #filter(journeyCode == "0630") %>% 
   st_as_sf(coords = c("lng","lat"), crs = 4326) %>% 
-  mutate(journeyCode = as.factor(journeyCode)) %>% 
-  mutate(journeyCodeUnq = paste0(journeyCode,"-",vehicleId
-  ))
+  mutate(journeyCode = as.factor(journeyCode)) %>%
+  mutate(day_code = str_pad(day, width = 2, pad = "0")) %>%
+  mutate(month_code = str_pad(month, width = 2, pad = "0")) %>%
+  mutate(year_code = str_extract(year, pattern = "\\d{2}$")) %>% 
+  mutate(journeyCodeUnq = paste0(journeyCode,"-",vehicleId,"-",year_code,month_code,day_code)) %>% 
+  select(-day_code, -month_code, -year_code)
 
 # # am 
 # bod_eg_am <- bod_eg %>% 
