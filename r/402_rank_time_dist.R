@@ -48,28 +48,28 @@ route_distance_calc <- function(pings , routes,  longest_stop_seq = longest_stop
   return(as.numeric(distance_along))
 }
 
-pings <- 
-  ping_snapper(pings = bod_eg, #%>% slice_sample(n = ping_sample_n), 
-               dir_lookup = in_out_lookup, 
-               route_shape = dc_routes,
-               dir = 0)
-
-
-pings <- pings %>% unique_trip_OD()
+# pings <- 
+#   ping_snapper(pings = bod_eg, #%>% slice_sample(n = ping_sample_n), 
+#                dir_lookup = in_out_lookup, 
+#                route_shape = dc_routes,
+#                dir = 0)
+# 
+# 
+# pings <- pings %>% unique_trip_OD()
 #glimpse(test_pings)
 
-pings <- pings %>%
-  #group_by(journeyCode, day, month) %>% 
-  mutate(dist_m = route_distance_calc(., routes = dc_routes, longest_stop_seq = longest_stop_seq, density = 0.5))
+# pings <- pings %>%
+#   #group_by(journeyCode, day, month) %>% 
+#   mutate(dist_m = route_distance_calc(., routes = dc_routes, longest_stop_seq = longest_stop_seq, density = 0.5))
 
-pings <- pings %>% 
-  group_by(journeyCode, day, month) %>% 
-  # normalise time to start of journey
-  mutate(time_trip = time - min(time)) %>% 
-  arrange(dist_m) %>% 
-  mutate(dist_m_rank = row_number()) %>% 
-  arrange(time_trip) %>% 
-  mutate(time_trip_rank = row_number())
+# pings <- pings %>% 
+#   group_by(journeyCode, day, month) %>% 
+#   # normalise time to start of journey
+#   mutate(time_trip = time - min(time)) %>% 
+#   arrange(dist_m) %>% 
+#   mutate(dist_m_rank = row_number()) %>% 
+#   arrange(time_trip) %>% 
+#   mutate(time_trip_rank = row_number())
 
 #unq_od_names <- pings$od_name %>% unique()
 #unq_od_names
@@ -79,8 +79,8 @@ pings <- pings %>%
 #unq_od_names <- unq_od_names[1]
 #pings <- pings %>% filter(od_name %in% unq_od_names)
 
-pings <- pings %>% 
-  mutate(journeyCodeUnq = paste0(journeyCode,"-",vehicleId))
+# pings <- pings %>% 
+#   mutate(journeyCodeUnq = paste0(journeyCode,"-",vehicleId))
 
 
 
