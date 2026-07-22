@@ -1,5 +1,6 @@
 #### leaflet map ####
 library(leaflet)
+library(htmltools)
 library(RColorBrewer)
 
 palette_fun <- khroma::color("bright")
@@ -17,7 +18,8 @@ map <-  leaflet::leaflet() %>%
 
 
 map <- map %>% addPolylines(data = pings_seg_speed, 
-                            color = ~pal_speed(speed_50), 
+                            color = ~pal_speed(speed_50),
+                            popup = ~seg_name,
                             opacity = 1,
                             group = "speed")
 
@@ -47,6 +49,9 @@ map <- map %>% addLegend("bottomright", pal = pal_iqr, values = 0:8 , # title = 
                          opacity = 1,
                          className = "legend-iqr",
                          group = "iqr")
+
+map <- map %>% addCircles(data = stops_1,
+                          label = ~htmlEscape(stop_name))
 
 map <- map  %>% addLayersControl(
   baseGroups = 
