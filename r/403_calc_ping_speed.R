@@ -19,11 +19,11 @@ ping_speed <- function(pings = pings){
   return(pings_new)
 }
 
-p <- ping_speed(pings) %>% 
-  filter(journeyCodeUnq %in% pings_unq_trip_id) %>% 
-  #head(20) %>% 
-  select(journeyCodeUnq, time, dist_m,
-         prev_ping_dist, time_trip, prev_ping_time, 
-         ping_speed)
-
-p
+# p <- ping_speed(pings) %>% 
+#   filter(journeyCodeUnq %in% pings_unq_trip_id) %>% 
+#   #head(20) %>% 
+#   select(journeyCodeUnq, time, dist_m,
+#          prev_ping_dist, time_trip, prev_ping_time, 
+#          ping_speed)
+# 
+# p

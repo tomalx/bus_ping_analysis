@@ -26,8 +26,8 @@ ping_filter <- function(pings = pings,
 }
 
 
-pings_plot <- pings %>% 
-  ping_filter()
+# pings_plot <- pings %>% 
+#   ping_filter()
 
 
 pings_plot <- pings %>% 
