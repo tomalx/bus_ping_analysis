@@ -22,14 +22,22 @@ route_stop_split <- split_at_stop(stop_seq = stops_1,
                           longest_stop_seq = longest_stop_seq
 )
 
-pings
+route_split_1 <- split_every_x_metres(
+  dir = 1,
+  routes = dc_routes,
+  longest_stop_seq = longest_stop_seq
+)  
 
 # breaks by a set distance
-dist_m_bin_size <- 400 ## size in metres
+dist_m_bin_size <- 250 ## size in metres
 
 # breaks by stop to stop distance
 seg_breaks <- stops_1$dist_m
 seg_names <- route_stop_split$seg_name
+
+# breaks by stop to stop distance
+seg_breaks <- route_split_1$start_seg
+seg_names <- route_split_1$seg_name
 
 
 pings_filtered <- pings %>% 
@@ -47,9 +55,9 @@ pings_filtered <- pings %>%
   # mutate(dist_m_bin =  cut(dist_m, breaks = 2)) 
   mutate(dist_m_bin = cut(dist_m,
                           #breaks = seg_breaks,
-                          #labels = seg_names
+                          labels = seg_names,
                           breaks = c(seq(0, max(dist_m), dist_m_bin_size)), 
-                          labels = c(seq(dist_m_bin_size, max(dist_m), dist_m_bin_size)) 
+                          #labels = c(seq(dist_m_bin_size, max(dist_m), dist_m_bin_size)) 
                           )) %>% 
   #remove rows with NA values
   filter(!is.na(dist_m_bin))
@@ -71,7 +79,7 @@ pings_seg_speed <- pings_filtered %>%
   summarise(speed_50 = mean(ping_speed),
             speed_iqr = IQR(ping_speed),
             speed_sd = sd(ping_speed)) %>% 
-  left_join(route_stop_split, by = c("dist_m_bin" = "seg_name")) %>% 
+  left_join(route_split_1, by = c("dist_m_bin" = "seg_name")) %>% 
   st_as_sf(crs = 27700) %>% 
   st_transform(4326)
 
