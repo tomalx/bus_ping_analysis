@@ -17,7 +17,7 @@ stops_1 <- stop_seq %>%
   #group_by(journeyCode, day, month) %>% 
   mutate(dist_m = route_distance_calc(., routes = dc_routes, longest_stop_seq = longest_stop_seq, density = 0.5))
 
-route_stop_split <- split_at_stop(stop_seq = stops_1,
+route_split_1 <- split_at_stop(stop_seq = stops_1,
                           routes = dc_routes,
                           longest_stop_seq = longest_stop_seq
 )
@@ -29,15 +29,15 @@ route_split_1 <- split_every_x_metres(
 )  
 
 # breaks by a set distance
-dist_m_bin_size <- 250 ## size in metres
+seg_size <- 250 ## size in metres
 
 # breaks by stop to stop distance
-seg_breaks <- stops_1$dist_m
-seg_names <- route_stop_split$seg_name
+seg_break <- stops_1$dist_m
+seg_name <- route_stop_split$seg_name
 
 # breaks by stop to stop distance
-seg_breaks <- route_split_1$start_seg
-seg_names <- route_split_1$seg_name
+seg_break <- c(route_split_1$start_seg, max(route_split_1$end_seg))
+seg_name <- route_split_1$seg_name
 
 
 pings_filtered <- pings %>% 
@@ -53,14 +53,14 @@ pings_filtered <- pings %>%
  # filter(stringr::str_starts(journeyCode, pattern = "08")) %>% 
   ping_speed() %>% 
   # mutate(dist_m_bin =  cut(dist_m, breaks = 2)) 
-  mutate(dist_m_bin = cut(dist_m,
-                          #breaks = seg_breaks,
-                          labels = seg_names,
-                          breaks = c(seq(0, max(dist_m), dist_m_bin_size)), 
+  mutate(seg_name = cut(dist_m,
+                          breaks = seg_break,
+                          labels = seg_name
+                          #breaks = c(seq(0, max(dist_m), dist_m_bin_size)), 
                           #labels = c(seq(dist_m_bin_size, max(dist_m), dist_m_bin_size)) 
                           )) %>% 
   #remove rows with NA values
-  filter(!is.na(dist_m_bin))
+  filter(!is.na(seg_name))
 
 
 #speed palette
@@ -75,29 +75,30 @@ pal_sd <- colorNumeric(palette = incandescent(6)[1:6], domain = 0:4)
 pings_seg_speed <- pings_filtered %>%
   st_drop_geometry() %>%
   filter(!is.na(ping_speed)) %>% 
-  group_by(dist_m_bin) %>% 
+  group_by(seg_name) %>% 
   summarise(speed_50 = mean(ping_speed),
             speed_iqr = IQR(ping_speed),
             speed_sd = sd(ping_speed)) %>% 
-  left_join(route_split_1, by = c("dist_m_bin" = "seg_name")) %>% 
+  left_join(route_split_1, by = c("seg_name" = "seg_name")) %>% 
   st_as_sf(crs = 27700) %>% 
   st_transform(4326)
 
 leaflet() %>% 
   addProviderTiles("CartoDB.Positron") %>% 
-  addPolylines(data = pings_seg_speed, color = ~pal_speed(speed_50), opacity = 1 )
+  addPolylines(data = pings_seg_speed, color = ~pal_speed(speed_50), opacity = 1 ) %>% 
+  addPolylines(data = pings_seg_speed, color = ~pal_speed(speed_50), opacity = 1 ) 
 
 
 
 pings_plot <- pings_filtered %>% 
-  group_by(journeyCodeUnq, dist_m_bin) %>% 
+  group_by(journeyCodeUnq, seg_name) %>% 
   mutate(sample_size = n()) %>%
   mutate(bin_speed = sum(ping_speed)/n()) %>% 
   ungroup()
 
 
 pings_plot %>% ggplot(
-  aes(x = dist_m_bin, y = bin_speed) #, group = journeyCodeUnq)
+  aes(x = seg_name, y = bin_speed) #, group = journeyCodeUnq)
 ) +
   geom_line(alpha = 0.1, stroke = NA, size = 1) +
   theme_minimal()
@@ -105,7 +106,7 @@ pings_plot %>% ggplot(
 
 ## x binned
 pings_plot %>% ggplot(
-  aes(x = dist_m_bin, y = ping_speed)
+  aes(x = seg_name, y = ping_speed)
 ) +
   geom_boxplot() +
   ylim(c(0,25)) +
