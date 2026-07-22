@@ -46,18 +46,18 @@ ping_snapper <- function(pings, dir_lookup, route_shape, dir = 1, buff_dist = 10
 
 # ping_sample_n <- 10000
 
-pings_day_1 <- 
-  ping_snapper(pings = bod_eg, #%>% slice_sample(n = ping_sample_n), 
-                          dir_lookup = in_out_lookup, 
-                          route_shape = dc_routes,
-                           dir = 1) # %>%
-  # slice_sample(n = ping_sample_n)
-
-pings_day_0 <- 
-  ping_snapper(pings = bod_eg, #%>% slice_sample(n = ping_sample_n), 
-               dir_lookup = in_out_lookup, 
-               route_shape = dc_routes,
-               dir = 0)  
+# pings_day_1 <- 
+#   ping_snapper(pings = bod_eg, #%>% slice_sample(n = ping_sample_n), 
+#                           dir_lookup = in_out_lookup, 
+#                           route_shape = dc_routes,
+#                            dir = 1) # %>%
+#   # slice_sample(n = ping_sample_n)
+# 
+# pings_day_0 <- 
+#   ping_snapper(pings = bod_eg, #%>% slice_sample(n = ping_sample_n), 
+#                dir_lookup = in_out_lookup, 
+#                route_shape = dc_routes,
+#                dir = 0)  
     
 
 # pings_am <- ping_snapper(pings = bod_eg_am , 
