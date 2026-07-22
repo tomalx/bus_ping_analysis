@@ -33,7 +33,7 @@ seg_size <- 250 ## size in metres
 
 # breaks by stop to stop distance
 seg_break <- stops_1$dist_m
-seg_name <- route_stop_split$seg_name
+seg_name <- route_split_1$seg_name
 
 # breaks by stop to stop distance
 seg_break <- c(route_split_1$start_seg, max(route_split_1$end_seg))
@@ -60,7 +60,10 @@ pings_filtered <- pings %>%
                           #labels = c(seq(dist_m_bin_size, max(dist_m), dist_m_bin_size)) 
                           )) %>% 
   #remove rows with NA values
-  filter(!is.na(seg_name))
+  filter(!is.na(seg_name)) %>% 
+  filter(prev_ping_dist < 600) %>%  # remove pings that are too far apart
+  filter(prev_ping_time > 5)
+  
 
 
 #speed palette
