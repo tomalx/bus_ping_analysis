@@ -69,9 +69,16 @@ pings_filtered <- pings %>%
 #speed palette
 incandescent <- khroma::color("incandescent")
 incandescent(6)[6:1]
-pal_speed <- colorNumeric(palette = incandescent(6)[6:1], domain = 0:12)
-pal_iqr <- colorNumeric(palette = incandescent(6)[1:6], domain = 0:8)
-pal_sd <- colorNumeric(palette = incandescent(6)[1:6], domain = 0:4)
+
+burg <- unname(
+  as.character(
+    paletteer::paletteer_d("rcartocolor::Burg", 7)
+  )
+)
+
+pal_speed <- colorNumeric(palette = incandescent(6)[6:1], domain = 0:15)
+pal_iqr <- colorNumeric(palette = burg, domain = 0:8)
+pal_sd <- colorNumeric(palette = burg, domain = 0:5)
 
 ####
 # join pings filtered to geometry of route_stop_split - join by seg_name = dist_m_bin

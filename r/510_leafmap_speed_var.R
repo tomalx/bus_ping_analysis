@@ -18,30 +18,33 @@ map <-  leaflet::leaflet() %>%
 
 map <- map %>% addPolylines(data = pings_seg_speed, 
                             color = ~pal_speed(speed_50), 
-                            #opacity = 1,
+                            opacity = 1,
                             group = "speed")
 
 map <- map %>% addPolylines(data = pings_seg_speed, 
                             color = ~pal_iqr(speed_iqr), 
-                            #opacity = 1,
+                            opacity = 1,
                             group = "iqr")
 
 map <- map %>% addPolylines(data = pings_seg_speed, 
                             color = ~pal_sd(speed_sd), 
-                            #opacity = 1,
+                            opacity = 1,
                             group = "sd")
 
-map <- map %>% addLegend("bottomright", pal = pal_speed, values = 0:20 , #title = "Average Speed (m/sec)", 
-                         #opacity = 1,
+map <- map %>% addLegend("bottomright", pal = pal_speed, values = 0:15 , #title = "Average Speed (m/sec)", 
+                         opacity = 1,
                          className = "legend-speed",
                          
                          group = "speed")
-map <- map %>% addLegend("bottomright", pal = pal_sd, values = 0:4 , # title = "standard deviation (m/sec)", 
-                         #opacity = 1,
+map <- map %>% addLegend("bottomright",
+                         pal = pal_sd,
+                         values = c(0, 5),
+                         opacity = 1,
                          className = "legend-sd",
-                         group = "sd")
+                         group = "sd"
+)
 map <- map %>% addLegend("bottomright", pal = pal_iqr, values = 0:8 , # title = "inter quartile range (m/sec)", 
-                         #opacity = 1,
+                         opacity = 1,
                          className = "legend-iqr",
                          group = "iqr")
 
