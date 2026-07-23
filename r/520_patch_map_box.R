@@ -58,7 +58,7 @@ boxplot <- pings_plot %>%
     ) %>% 
   ungroup() %>% 
   ggplot(
-  aes(x = forcats::fct_rev(seg_name), y = ping_speed, group = seg_name, fill = ping_speed_median)
+  aes(x = forcats::fct_rev(seg_name), y = ping_speed, group = seg_name, fill = ping_speed_mean)
 ) +
   geom_boxplot_interactive(aes(data_id = as.character(seg_name), tooltip = tooltip_text), outliers = FALSE) +
   ylim(c(0,25)) +

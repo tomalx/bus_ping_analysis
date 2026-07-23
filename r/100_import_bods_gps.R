@@ -23,7 +23,7 @@ library(arrow)
 library(dplyr)
 library(glue)
 
-route_number <- "3"
+route_number <- "6"
 
 
 setwd("bus_ping_analysis")
