@@ -97,8 +97,8 @@ pings <- pings %>%
 #unq_od_names <- unq_od_names[1]
 # pings <- pings %>% filter(od_name %in% unq_od_names) # possibly remove???
 
-pings <- pings %>% 
-  mutate(journeyCodeUnq = paste0(journeyCode,"-",vehicleId))
+# pings <- pings %>% 
+#   mutate(journeyCodeUnq = paste0(journeyCode,"-",vehicleId))
 # pings <- 
 #   ping_snapper(pings = bod_eg, #%>% slice_sample(n = ping_sample_n), 
 #                dir_lookup = in_out_lookup, 
