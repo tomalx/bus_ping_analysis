@@ -36,7 +36,7 @@ ggplot_time_of_day_jny_time <- function(pings){
   plot <- ggplot(plot, aes(y = time_trip, x = departure_time #, color = journeyCodeUnq
   )) +
     geom_point(# aes(group = journeyCodeUnq),
-               color = pal[2], #linewidth = 0.1
+               color = "#bb44bb", #linewidth = 0.1
                ) +
     # geom_line(data = bod_plot %>% filter(hour(time) %in% highlight), 
     #           aes(group = journeyCodeUnq), 
