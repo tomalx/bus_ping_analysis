@@ -51,14 +51,20 @@ split_at_stop <- function(stop_seq = stop_seq , routes,
   return(sf_obj)
 }
 
-my_route <- split_at_stop(stop_seq = stops_0,
+
+## example use case (requires stops_0 object - see 902_plot_speed)
+
+my_route <- split_at_stop(stop_seq = stops_0,   # stops_0 object is created in 902_plot_speed
                           routes = dc_routes,
                           longest_stop_seq = longest_stop_seq
                           )
 my_route <- st_cast(my_route, "LINESTRING")
 
 leaflet::leaflet() %>% leaflet::addProviderTiles("CartoDB.Positron") %>% 
-  leaflet::addPolylines(data = my_route %>% st_set_crs(27700) %>% st_transform(4326))
+  leaflet::addPolylines(data = my_route %>% st_set_crs(27700) %>% st_transform(4326),
+                        color = RColorBrewer::brewer.pal(6, "Set2")[1:5],
+                        label = ~seg_name,
+                        opacity = 1)
 
 plot(my_route)
 plot(sf::st_geometry(my_route), col = c(1,2,5), lwd = 3)

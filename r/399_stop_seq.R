@@ -7,8 +7,8 @@
 
 route_id_filtered <- dc_routes$route_id %>% unique
 
-calendar_filtered <- gtfs_sf$calendar %>% filter(  tuesday == 1 &     # filter for mon-fri service pattern
-                                                     wednesday == 1 &   # tue,wed,thu accounts for some
+calendar_filtered <- gtfs_sf$calendar %>% filter( # tuesday == 1 &     # filter for mon-fri service pattern
+                                                  #   wednesday == 1 &   # tue,wed,thu accounts for some
                                                      thursday == 1) %>% # unique fri service_ids
   pull(service_id)
 
