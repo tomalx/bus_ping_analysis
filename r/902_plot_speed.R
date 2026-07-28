@@ -22,6 +22,11 @@ route_split_1 <- split_at_stop(stop_seq = stops_1,
                           longest_stop_seq = longest_stop_seq
 )
 
+route_split_0 <- split_at_stop(stop_seq = stops_0,
+                               routes = dc_routes,
+                               longest_stop_seq = longest_stop_seq
+)
+
 # breaks by a set distance
 seg_size <- 100 ## size in metres
 
@@ -33,17 +38,19 @@ route_split_1 <- split_every_x_metres(
 )  
 
 
-# breaks by stop to stop distance
-seg_break <- stops_1$dist_m
-seg_name <- route_split_1$seg_name
+# breaks by stop to stop distance - USE WITH SPLIT AT STOP
+seg_break_0 <- stops_0$dist_m
+seg_name_0 <- route_split_0$seg_name
 
-# breaks by stop to stop distance
+# breaks by stop to stop distance - USE WITH SPLIT AT X METRES
 seg_break <- c(route_split_1$start_seg, max(route_split_1$end_seg))
 seg_name <- route_split_1$seg_name
 
 
-pings_filtered <- pings %>% 
-  ping_filter(direction = 1, 
+
+## outbound
+pings_filtered_0 <- pings %>% 
+  ping_filter(direction = 0, 
               hr_of_day = c(0:23) #, 
              # sample_jnycode = 25
              ) %>%
@@ -66,7 +73,30 @@ pings_filtered <- pings %>%
   filter(prev_ping_dist < 600) %>%  # remove pings that are too far apart
   filter(prev_ping_time > 5)
   
-
+# inbound
+pings_filtered_1 <- pings %>% 
+  ping_filter(direction = 1, 
+              hr_of_day = c(0:23) #, 
+              # sample_jnycode = 25
+  ) %>%
+  group_by(journeyCodeUnq,day) %>% 
+  mutate(n = n()) %>% 
+  ungroup() %>% 
+  filter(n > 80) %>% 
+  
+  # filter(stringr::str_starts(journeyCode, pattern = "08")) %>% 
+  ping_speed() %>% 
+  # mutate(dist_m_bin =  cut(dist_m, breaks = 2)) 
+  mutate(seg_name = cut(dist_m,
+                        breaks = seg_break,
+                        labels = seg_name
+                        #breaks = c(seq(0, max(dist_m), dist_m_bin_size)), 
+                        #labels = c(seq(dist_m_bin_size, max(dist_m), dist_m_bin_size)) 
+  )) %>% 
+  #remove rows with NA values
+  filter(!is.na(seg_name)) %>% 
+  filter(prev_ping_dist < 600) %>%  # remove pings that are too far apart
+  filter(prev_ping_time > 5)
 
 #speed palette
 incandescent <- khroma::color("incandescent")
@@ -84,7 +114,20 @@ pal_sd <- colorNumeric(palette = burg, domain = 0:5)
 
 ####
 # join pings filtered to geometry of route_stop_split - join by seg_name = dist_m_bin
-pings_seg_speed <- pings_filtered %>%
+# outbound
+pings_seg_speed_0 <- pings_filtered_0 %>%
+  st_drop_geometry() %>%
+  filter(!is.na(ping_speed)) %>% 
+  group_by(seg_name) %>% 
+  summarise(speed_50 = mean(ping_speed),
+            speed_iqr = IQR(ping_speed),
+            speed_sd = sd(ping_speed)) %>% 
+  left_join(route_split_0, by = c("seg_name" = "seg_name")) %>% 
+  st_as_sf(crs = 27700) %>% 
+  st_transform(4326)
+
+# inbound
+pings_seg_speed_1 <- pings_filtered_1 %>%
   st_drop_geometry() %>%
   filter(!is.na(ping_speed)) %>% 
   group_by(seg_name) %>% 
@@ -94,6 +137,10 @@ pings_seg_speed <- pings_filtered %>%
   left_join(route_split_1, by = c("seg_name" = "seg_name")) %>% 
   st_as_sf(crs = 27700) %>% 
   st_transform(4326)
+
+# join inbound and outbound segs
+pings_seg_both_dir <- rbind(pings_seg_speed_0, pings_seg_speed_1)
+
 
 leaflet() %>% 
   addProviderTiles("CartoDB.Positron") %>% 
