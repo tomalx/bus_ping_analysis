@@ -2,6 +2,12 @@
 library(leaflet.extras2) # for arrowheads function
 library(htmltools)
 
+### To Do : -> -> -> -> 
+###        segment by length
+###        variance and speed on same map
+###        maybe use thickness of line for variance???
+###        speed by time of day
+
 # seg_avg_speed <- pings_seg_both_dir %>%
 #   slice_min(speed_50,n = 20)
 
