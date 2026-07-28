@@ -22,14 +22,16 @@ route_split_1 <- split_at_stop(stop_seq = stops_1,
                           longest_stop_seq = longest_stop_seq
 )
 
+# breaks by a set distance
+seg_size <- 100 ## size in metres
+
 route_split_1 <- split_every_x_metres(
   dir = 1,
   routes = dc_routes,
+  dist = seg_size,
   longest_stop_seq = longest_stop_seq
 )  
 
-# breaks by a set distance
-seg_size <- 250 ## size in metres
 
 # breaks by stop to stop distance
 seg_break <- stops_1$dist_m
@@ -76,7 +78,7 @@ burg <- unname(
   )
 )
 
-pal_speed <- colorNumeric(palette = incandescent(6)[6:1], domain = 0:15)
+pal_speed <- colorNumeric(palette = incandescent(6)[6:1], domain = 0:20)
 pal_iqr <- colorNumeric(palette = burg, domain = 0:8)
 pal_sd <- colorNumeric(palette = burg, domain = 0:5)
 
@@ -95,8 +97,8 @@ pings_seg_speed <- pings_filtered %>%
 
 leaflet() %>% 
   addProviderTiles("CartoDB.Positron") %>% 
-  addPolylines(data = pings_seg_speed, color = ~pal_speed(speed_50), opacity = 1 ) %>% 
-  addPolylines(data = pings_seg_speed, color = ~pal_speed(speed_50), opacity = 1 ) 
+  addPolylines(data = pings_seg_speed, color = ~pal_speed(speed_50), opacity = 1 ) #%>% 
+  #addPolylines(data = pings_seg_speed, color = ~pal_speed(speed_50), opacity = 1 ) 
 
 
 
@@ -115,15 +117,27 @@ pings_plot %>% ggplot(
 
 
 ## x binned
-pings_plot %>% ggplot(
+boxplot <- pings_plot %>% ggplot(
   aes(x = seg_name, y = ping_speed)
 ) +
   geom_boxplot() +
   ylim(c(0,25)) +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+ # scale_x_reverse() +
+  coord_flip() +
+  theme_void()
   #scale_x_binned()
 
-pings_plot %>% ggplot(
+boxplot
+
+sample_journeys <-  pings_plot %>% 
+  pull(journeyCodeUnq) %>% 
+  unique() %>% 
+  sample(5)
+
+pings_plot %>%
+  filter(journeyCodeUnq %in% sample_journeys) %>% 
+  ggplot(
   aes(x = dist_m, 
       y = as.numeric(time_trip) , 
       group = journeyCodeUnq
