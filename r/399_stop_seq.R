@@ -3,7 +3,9 @@
 #routes_select <- c("3")
 
 
-routes_filtered <- gtfs_sf$routes %>% filter(route_short_name %in% route_number)
+#routes_filtered <- gtfs_sf$routes %>% filter(route_short_name %in% route_number)
+
+route_id_filtered <- dc_routes$route_id %>% unique
 
 calendar_filtered <- gtfs_sf$calendar %>% filter(  tuesday == 1 &     # filter for mon-fri service pattern
                                                      wednesday == 1 &   # tue,wed,thu accounts for some
@@ -12,7 +14,7 @@ calendar_filtered <- gtfs_sf$calendar %>% filter(  tuesday == 1 &     # filter f
 
 # filter trips - extract only weekday services and selected routes
 trips_filtered <- gtfs_sf$trips %>% 
-  filter(route_id %in% routes_filtered$route_id) %>% 
+  filter(route_id %in% route_id_filtered) %>% 
   filter(service_id %in% calendar_filtered)
 rm(calendar_filtered)
 
