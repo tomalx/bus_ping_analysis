@@ -41,17 +41,22 @@ route_split_1 <- split_every_x_metres(
 # breaks by stop to stop distance - USE WITH SPLIT AT STOP
 seg_break_0 <- stops_0$dist_m
 seg_name_0 <- route_split_0$seg_name
+seg_break_1 <- stops_1$dist_m
+seg_name_1 <- route_split_1$seg_name
 
 # breaks by stop to stop distance - USE WITH SPLIT AT X METRES
-seg_break <- c(route_split_1$start_seg, max(route_split_1$end_seg))
-seg_name <- route_split_1$seg_name
+seg_break_1 <- c(route_split_1$start_seg, max(route_split_1$end_seg))
+seg_name_1 <- route_split_1$seg_name
+seg_break_0 <- c(route_split_0$start_seg, max(route_split_0$end_seg))
+seg_name_0 <- route_split_0$seg_name
 
 
+hours_of_day <- c(7:9)
 
 ## outbound
 pings_filtered_0 <- pings %>% 
   ping_filter(direction = 0, 
-              hr_of_day = c(0:23) #, 
+              hr_of_day = hours_of_day #, 
              # sample_jnycode = 25
              ) %>%
   group_by(journeyCodeUnq,day) %>% 
@@ -63,8 +68,8 @@ pings_filtered_0 <- pings %>%
   ping_speed() %>% 
   # mutate(dist_m_bin =  cut(dist_m, breaks = 2)) 
   mutate(seg_name = cut(dist_m,
-                          breaks = seg_break,
-                          labels = seg_name
+                          breaks = seg_break_0,
+                          labels = seg_name_0
                           #breaks = c(seq(0, max(dist_m), dist_m_bin_size)), 
                           #labels = c(seq(dist_m_bin_size, max(dist_m), dist_m_bin_size)) 
                           )) %>% 
@@ -76,7 +81,7 @@ pings_filtered_0 <- pings %>%
 # inbound
 pings_filtered_1 <- pings %>% 
   ping_filter(direction = 1, 
-              hr_of_day = c(0:23) #, 
+              hr_of_day = hours_of_day #, 
               # sample_jnycode = 25
   ) %>%
   group_by(journeyCodeUnq,day) %>% 
@@ -88,8 +93,8 @@ pings_filtered_1 <- pings %>%
   ping_speed() %>% 
   # mutate(dist_m_bin =  cut(dist_m, breaks = 2)) 
   mutate(seg_name = cut(dist_m,
-                        breaks = seg_break,
-                        labels = seg_name
+                        breaks = seg_break_1,
+                        labels = seg_name_1
                         #breaks = c(seq(0, max(dist_m), dist_m_bin_size)), 
                         #labels = c(seq(dist_m_bin_size, max(dist_m), dist_m_bin_size)) 
   )) %>% 
@@ -122,7 +127,8 @@ pings_seg_speed_0 <- pings_filtered_0 %>%
   summarise(speed_50 = mean(ping_speed),
             speed_iqr = IQR(ping_speed),
             speed_sd = sd(ping_speed)) %>% 
-  left_join(route_split_0, by = c("seg_name" = "seg_name")) %>% 
+  left_join(route_split_0, by = c("seg_name" = "seg_name")) %>%
+  mutate(direction_id = 0) %>% 
   st_as_sf(crs = 27700) %>% 
   st_transform(4326)
 
@@ -135,6 +141,7 @@ pings_seg_speed_1 <- pings_filtered_1 %>%
             speed_iqr = IQR(ping_speed),
             speed_sd = sd(ping_speed)) %>% 
   left_join(route_split_1, by = c("seg_name" = "seg_name")) %>% 
+  mutate(direction_id = 1) %>% 
   st_as_sf(crs = 27700) %>% 
   st_transform(4326)
 
@@ -145,7 +152,7 @@ pings_seg_both_dir <- rbind(pings_seg_speed_0, pings_seg_speed_1)
 
 leaflet() %>% 
   addProviderTiles("CartoDB.Positron") %>% 
-  addPolylines(data = pings_seg_speed, color = ~pal_speed(speed_50), opacity = 1 ) #%>% 
+  addPolylines(data = pings_seg_speed_1, color = ~pal_speed(speed_50), opacity = 1 ) #%>% 
   #addPolylines(data = pings_seg_speed, color = ~pal_speed(speed_50), opacity = 1 ) 
 
 

@@ -2,18 +2,28 @@
 library(leaflet.extras2) # for arrowheads function
 library(htmltools)
 
-seg_avg_speed <- pings_seg_both_dir %>%
-  slice_min(speed_50,n = 20)
+# seg_avg_speed <- pings_seg_both_dir %>%
+#   slice_min(speed_50,n = 20)
 
-seg_sd_speed <- pings_seg_both_dir %>%
-  slice_max(speed_sd,n = 20)
+# seg_sd_speed <- pings_seg_both_dir %>%
+#   slice_max(speed_sd,n = 20)
+
+top_n <- 20
 
 
 map <- leaflet() %>% 
   addProviderTiles("CartoDB.Positron") %>% 
-  addPolylines(data = seg_avg_speed, color = ~pal_speed(speed_50), opacity = 1,
+  addPolylines(data = pings_seg_both_dir %>% 
+                # slice_min(speed_50, n = 20), 
+                  filter(direction_id == 0),
+               color = ~pal_speed(speed_50), opacity = 1,
                group = "speed") %>% 
-  addArrowhead(data = seg_avg_speed, color = ~pal_speed(speed_50), opacity = 1,
+  addArrowhead(data = pings_seg_both_dir %>% 
+                 # slice_min(speed_50, n = 20), 
+                 filter(direction_id == 0),  
+               color = ~pal_speed(speed_50), opacity = 1,
+               popup = ~paste0("<b>",htmlEscape(seg_name),"</b>","<br>",
+                               "Average Speed: ", htmlEscape(round(speed_50,2)),"m/s"),
                options = arrowheadOptions(
                  yawn = 75,
                  size = "10px",
@@ -22,9 +32,18 @@ map <- leaflet() %>%
                  offsets = list('start' = '50px', 'end' = '50px'),
                  perArrowheadOptions = NULL),
                group = "speed") %>% 
-  addPolylines(data = seg_sd_speed, color = ~pal_sd(speed_sd), opacity = 1,
+  addPolylines(data = pings_seg_both_dir %>% 
+                 # slice_min(speed_50, n = 20), 
+                 filter(direction_id == 1),
+               color = ~pal_sd(speed_sd), 
+               opacity = 1,
                group = "variation") %>% 
-  addArrowhead(data = seg_sd_speed, color = ~pal_sd(speed_sd), opacity = 1,
+  addArrowhead(data = pings_seg_both_dir %>% 
+                 # slice_min(speed_50, n = 20), 
+                 filter(direction_id == 1),  
+               color = ~pal_sd(speed_sd), opacity = 1,
+               popup = ~paste0("<b>",htmlEscape(seg_name),"</b>","<br>",
+                               "Speed standard deviation: ", htmlEscape(round(speed_sd,2)),"m/s"),
                options = arrowheadOptions(
                  yawn = 75,
                  size = "10px",
@@ -34,14 +53,18 @@ map <- leaflet() %>%
                  perArrowheadOptions = NULL),
                group = "variation")
 
-
-map <- map %>% addLegend("bottomright", pal = pal_speed, values = 0:15 , #title = "Average Speed (m/sec)", 
+map
+map <- map %>% addLegend("bottomright", 
+                         title = "Average Speed <br>(m/s)",
+                         labFormat = labelFormat(suffix = " m/s"),
+                         pal = pal_speed, values = 0:15 , #title = "Average Speed (m/sec)", 
                          opacity = 1,
                          className = "legend-speed",
-                         
                          group = "speed")
 
 map <- map %>% addLegend("bottomright",
+                         title = "Variation in speeds <br>(standard deviation - m/s)",
+                         labFormat = labelFormat(suffix = " m/s"),
                          pal = pal_sd,
                          values = 0:5,
                          opacity = 1,
@@ -61,6 +84,9 @@ map <- map %>% addCircles(data = stops_0,
 
 map <- map %>% addCircles(data = stops_1,
                           label = ~htmlEscape(stop_name),
+                          radius = 2,
+                          fill = NA,
+                          opacity = 1,
                           color = "#444")
 
 map <- map  %>% addLayersControl(
