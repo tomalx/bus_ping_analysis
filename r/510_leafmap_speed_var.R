@@ -51,7 +51,8 @@ map <- map %>% addLegend("bottomright", pal = pal_iqr, values = 0:8 , # title = 
                          group = "iqr")
 
 map <- map %>% addCircles(data = stops_1,
-                          label = ~htmlEscape(stop_name))
+                          label = ~htmlEscape(stop_name),
+                          color = "#bcbcbc")
 
 map <- map  %>% addLayersControl(
   baseGroups = 
