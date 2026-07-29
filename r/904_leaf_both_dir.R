@@ -1,4 +1,5 @@
 # requires pings_seg_both_dir
+library(leaflet.extras) # for grouped layers control
 library(leaflet.extras2) # for arrowheads function
 library(htmltools)
 
@@ -54,13 +55,13 @@ map <- leaflet() %>%
                group = "speed") %>% 
   addPolylines(data = pings_seg_both_dir %>% 
                  # slice_min(speed_50, n = 20), 
-                 filter(direction_id == 1),
+                 filter(direction_id == 0),
                color = ~pal_sd(speed_sd), 
                opacity = 1,
                group = "variation") %>% 
   addArrowhead(data = pings_seg_both_dir %>% 
                  # slice_min(speed_50, n = 20), 
-                 filter(direction_id == 1),  
+                 filter(direction_id == 0),  
                color = ~pal_sd(speed_sd), opacity = 1,
                popup = ~paste0("<b>",htmlEscape(seg_name),"</b>","<br>",
                                "Speed standard deviation: ", htmlEscape(round(speed_sd,2)),"m/s"),
@@ -100,37 +101,33 @@ map <- map %>% addCircles(data = stops_0,
                           radius = 2,
                           fill = NA,
                           opacity = 1,
-                          color = "#444")
+                          color = "#444",
+                          group = "outbound stops")
 
 map <- map %>% addCircles(data = stops_1,
                           label = ~htmlEscape(stop_name),
                           radius = 2,
                           fill = NA,
                           opacity = 1,
-                          color = "#444")
+                          color = "#444",
+                          group = "inbound stops")
 
-map <- map  %>% addLayersControl(
-  baseGroups = 
-    # c("OSM", "carto"),
-    # overlayGroups =
-    c(
-      #as.character(1:nrow(dc_routes)),
-      # "nearest lines in",
-      # "nearest lines out",
-      # "original points in",
-      # "original points out",
-      # "snapped points in",
-      # "snapped points",
-      # "heatmap in",
-      # "heatmap out",
-      "speed",
-      #"iqr",
-      "variation"
-      # "heatmap in am",
-      # "heatmap out am"
-      
-    ),
-  options = layersControlOptions(collapsed = FALSE))
+map <- map  %>% addGroupedLayersControl(
+  overlayGroups = list(
+    "stops" = c("inbound stops", "outbound stops"),
+    "average speed" = c("speed", "am-peak", "pm-peak", "inter-peak", "early", "late"),
+    "speed variation" = c("variation", "peak")
+  )#,
+  # options = groupedLayersControlOptions(
+  #   groupCheckboxes = TRUE,
+  #   collapsed = FALSE,
+  #   groupsCollapsable = TRUE,
+  #   sortLayers = FALSE,
+  #   sortGroups = FALSE,
+  #   sortBaseLayers = FALSE,
+  #   exclusiveGroups = c("average speed","speed variation")
+  # )  
+    )
 
 
 

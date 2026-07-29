@@ -56,7 +56,7 @@ hours_of_day <- c(7:9)
 ## outbound
 pings_filtered_0 <- pings %>% 
   ping_filter(direction = 0, 
-              hr_of_day = hours_of_day #, 
+              hr_of_day = c(8,9) #, 
              # sample_jnycode = 25
              ) %>%
   group_by(journeyCodeUnq,day) %>% 
@@ -75,13 +75,17 @@ pings_filtered_0 <- pings %>%
                           )) %>% 
   #remove rows with NA values
   filter(!is.na(seg_name)) %>% 
-  filter(prev_ping_dist < 600) %>%  # remove pings that are too far apart
-  filter(prev_ping_time > 5)
+  filter(prev_ping_dist < 600) %>%  # remove pings that are too far (distance) apart
+  filter(prev_ping_time > 5) %>% # remove pings that are too close together (time)
+  group_by(seg_name, journeyCodeUnq, day) %>% 
+  mutate(seg_ping_count = n()) %>% 
+  filter_out(seg_ping_count > 20 & ping_speed <1) %>% 
+  ungroup()
   
 # inbound
 pings_filtered_1 <- pings %>% 
   ping_filter(direction = 1, 
-              hr_of_day = hours_of_day #, 
+              hr_of_day = c(8,9) #, 
               # sample_jnycode = 25
   ) %>%
   group_by(journeyCodeUnq,day) %>% 
@@ -101,21 +105,13 @@ pings_filtered_1 <- pings %>%
   #remove rows with NA values
   filter(!is.na(seg_name)) %>% 
   filter(prev_ping_dist < 600) %>%  # remove pings that are too far apart
-  filter(prev_ping_time > 5)
+  filter(prev_ping_time > 5) %>% 
+  group_by(seg_name, journeyCodeUnq, day) %>% 
+  mutate(seg_ping_count = n()) %>% 
+  filter_out(seg_ping_count > 20 & ping_speed <1) %>% 
+  ungroup()
 
-#speed palette
-incandescent <- khroma::color("incandescent")
-incandescent(6)[6:1]
 
-burg <- unname(
-  as.character(
-    paletteer::paletteer_d("rcartocolor::Burg", 7)
-  )
-)
-
-pal_speed <- colorNumeric(palette = incandescent(6)[6:1], domain = 0:20)
-pal_iqr <- colorNumeric(palette = burg, domain = 0:8)
-pal_sd <- colorNumeric(palette = burg, domain = 0:5)
 
 ####
 # join pings filtered to geometry of route_stop_split - join by seg_name = dist_m_bin
