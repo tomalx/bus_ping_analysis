@@ -55,6 +55,7 @@ parquet/
 html/
 qmd/
 gif/
+geojson/
 explore_pings/
 todo.txt
 presentation.txt

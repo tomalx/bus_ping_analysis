@@ -51,12 +51,12 @@ seg_break_0 <- c(route_split_0$start_seg, max(route_split_0$end_seg))
 seg_name_0 <- route_split_0$seg_name
 
 
-hours_of_day <- c(7:9)
+hours_of_day <- c(0:23)
 
 ## outbound
 pings_filtered_0 <- pings %>% 
   ping_filter(direction = 0, 
-              hr_of_day = c(8,9) #, 
+              hr_of_day = hours_of_day #, 
              # sample_jnycode = 25
              ) %>%
   group_by(journeyCodeUnq,day) %>% 
@@ -85,7 +85,7 @@ pings_filtered_0 <- pings %>%
 # inbound
 pings_filtered_1 <- pings %>% 
   ping_filter(direction = 1, 
-              hr_of_day = c(8,9) #, 
+              hr_of_day = hours_of_day #, 
               # sample_jnycode = 25
   ) %>%
   group_by(journeyCodeUnq,day) %>% 
@@ -120,11 +120,22 @@ pings_seg_speed_0 <- pings_filtered_0 %>%
   st_drop_geometry() %>%
   filter(!is.na(ping_speed)) %>% 
   group_by(seg_name) %>% 
-  summarise(speed_50 = mean(ping_speed),
-            speed_iqr = IQR(ping_speed),
-            speed_sd = sd(ping_speed)) %>% 
-  left_join(route_split_0, by = c("seg_name" = "seg_name")) %>%
-  mutate(direction_id = 0) %>% 
+  mutate(speed_50 = mean(ping_speed),
+         speed_iqr = IQR(ping_speed),
+         speed_sd = sd(ping_speed)) %>% 
+  mutate(time_period = case_when(hour(time) %in% c(8,9) ~ "am_peak",
+                                 hour(time) %in% c(17,18) ~ "pm_peak",
+                                 hour(time) %in% c(10,11,12,13,14,15,16) ~ "inter_peak",
+                                 .default = "early_late")
+  ) %>%
+  group_by(seg_name, time_period) %>% 
+  summarise(speed_50_tp = mean(ping_speed),
+            speed_50 = first(speed_50),
+            speed_iqr = first(speed_iqr),
+            speed_sd = first(speed_sd)) %>% 
+  pivot_wider(names_from = time_period, names_glue = "speed_{time_period}",values_from = speed_50_tp) %>% 
+  left_join(route_split_1, by = c("seg_name" = "seg_name")) %>% 
+  mutate(direction_id = 1) %>% 
   st_as_sf(crs = 27700) %>% 
   st_transform(4326)
 
@@ -133,9 +144,23 @@ pings_seg_speed_1 <- pings_filtered_1 %>%
   st_drop_geometry() %>%
   filter(!is.na(ping_speed)) %>% 
   group_by(seg_name) %>% 
-  summarise(speed_50 = mean(ping_speed),
+  mutate(speed_50 = mean(ping_speed),
             speed_iqr = IQR(ping_speed),
             speed_sd = sd(ping_speed)) %>% 
+  mutate(time_period = case_when(hour(time) %in% c(8,9) ~ "am_peak",
+                                 hour(time) %in% c(17,18) ~ "pm_peak",
+                                 hour(time) %in% c(10,11,12,13,14,15,16) ~ "inter_peak",
+                                 .default = "early_late")
+         ) %>%
+  group_by(seg_name, time_period) %>% 
+  summarise(speed_50_tp = mean(ping_speed),
+            speed_50 = first(speed_50),
+            speed_iqr = first(speed_iqr),
+            speed_sd = first(speed_sd)) %>% 
+  pivot_wider(names_from = time_period, names_glue = "speed_{time_period}",values_from = speed_50_tp) %>% 
+  
+  # pivot wider here : aim cols of time period speed
+  
   left_join(route_split_1, by = c("seg_name" = "seg_name")) %>% 
   mutate(direction_id = 1) %>% 
   st_as_sf(crs = 27700) %>% 

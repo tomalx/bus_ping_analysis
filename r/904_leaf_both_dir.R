@@ -3,6 +3,8 @@ library(leaflet.extras) # for grouped layers control
 library(leaflet.extras2) # for arrowheads function
 library(htmltools)
 
+schemes <- st_read(choose.files())
+
 ### To Do : -> -> -> -> 
 ###        segment by length
 ###        variance and speed on same map
@@ -125,6 +127,9 @@ map <- map %>% addCircles(data = stops_1,
                           opacity = 1,
                           color = "#444",
                           group = "northbound stops")
+
+map <- map %>% addPolygons(data = schemes %>% filter(intervention_type == "area"))
+map <- map %>% addPolylines(data = schemes %>% filter(intervention_type == "route"))
 
 map <- map  %>% addGroupedLayersControl(
       overlayGroups = list(
