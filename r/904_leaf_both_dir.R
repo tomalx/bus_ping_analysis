@@ -9,6 +9,9 @@ library(htmltools)
 ###        maybe use thickness of line for variance???
 ###        speed by time of day
 
+###        more than one route
+###        both top 10 variance and lowest 10 speed
+
 # seg_avg_speed <- pings_seg_both_dir %>%
 #   slice_min(speed_50,n = 20)
 
@@ -31,48 +34,59 @@ pal_speed <- colorNumeric(palette = incandescent(6)[6:1], domain = 0:20)
 pal_iqr <- colorNumeric(palette = burg, domain = 0:8)
 pal_sd <- colorNumeric(palette = burg, domain = 0:5)
 
+range01 <- function(x){(x-min(x))/(max(x)-min(x))}
+
+pings_seg_both_dir <- pings_seg_both_dir %>% 
+  mutate(speed_sd_scaled = rescale(speed_sd, to = c(1,10))) %>% 
+  mutate(speed_50_scaled = rescale(speed_50, to = c(0,15)))
+
 
 map <- leaflet() %>% 
   addProviderTiles("CartoDB.Positron") %>% 
-  addPolylines(data = pings_seg_both_dir %>% 
-                # slice_min(speed_50, n = 20), 
-                  filter(direction_id == 0),
-               color = ~pal_speed(speed_50), opacity = 1,
-               group = "speed") %>% 
+  # addPolylines(data = pings_seg_both_dir %>% 
+  #               # slice_min(speed_50, n = 20), 
+  #                 filter(direction_id == 0),
+  #              weight = ~speed_sd,
+  #              color = ~pal_speed(speed_50), opacity = 1,
+  #              group = "speed") %>% 
   addArrowhead(data = pings_seg_both_dir %>% 
                  # slice_min(speed_50, n = 20), 
                  filter(direction_id == 0),  
-               color = ~pal_speed(speed_50), opacity = 1,
+               color = ~pal_speed(speed_50_scaled), opacity = 1,
+               weight = ~speed_sd_scaled,
                popup = ~paste0("<b>",htmlEscape(seg_name),"</b>","<br>",
-                               "Average Speed: ", htmlEscape(round(speed_50,2)),"m/s"),
-               options = arrowheadOptions(
-                 yawn = 75,
-                 size = "10px",
-                 frequency = '50px',
-                 fill = FALSE,
-                 offsets = list('start' = '50px', 'end' = '50px'),
-                 perArrowheadOptions = NULL),
-               group = "speed") %>% 
-  addPolylines(data = pings_seg_both_dir %>% 
-                 # slice_min(speed_50, n = 20), 
-                 filter(direction_id == 0),
-               color = ~pal_sd(speed_sd), 
-               opacity = 1,
-               group = "variation") %>% 
-  addArrowhead(data = pings_seg_both_dir %>% 
-                 # slice_min(speed_50, n = 20), 
-                 filter(direction_id == 0),  
-               color = ~pal_sd(speed_sd), opacity = 1,
-               popup = ~paste0("<b>",htmlEscape(seg_name),"</b>","<br>",
+                               "Average Speed: ", htmlEscape(round(speed_50,2)),"m/s","<br>",
                                "Speed standard deviation: ", htmlEscape(round(speed_sd,2)),"m/s"),
                options = arrowheadOptions(
-                 yawn = 75,
-                 size = "10px",
-                 frequency = '50px',
-                 fill = FALSE,
+                 yawn = 60,
+                 size = "20px",
+                 frequency = '100px',
+                 fill = TRUE,
                  offsets = list('start' = '50px', 'end' = '50px'),
                  perArrowheadOptions = NULL),
-               group = "variation")
+               group = "southbound") %>% 
+  # addPolylines(data = pings_seg_both_dir %>% 
+  #                # slice_min(speed_50, n = 20), 
+  #                filter(direction_id == 0),
+  #              color = ~pal_sd(speed_sd), 
+  #              opacity = 1,
+  #              group = "variation") %>% 
+  addArrowhead(data = pings_seg_both_dir %>% 
+                 # slice_min(speed_50, n = 20), 
+                 filter(direction_id == 1),  
+               color = ~pal_speed(speed_50_scaled), opacity = 1,
+               weight = ~speed_sd_scaled,
+               popup = ~paste0("<b>",htmlEscape(seg_name),"</b>","<br>",
+                               "Average Speed: ", htmlEscape(round(speed_50,2)),"m/s","<br>",
+                               "Speed standard deviation: ", htmlEscape(round(speed_sd,2)),"m/s"),
+               options = arrowheadOptions(
+                 yawn = 60,
+                 size = "20px",
+                 frequency = '100px',
+                 fill = TRUE,
+                 offsets = list('start' = '50px', 'end' = '50px'),
+                 perArrowheadOptions = NULL),
+               group = "northbound")
 
 map
 map <- map %>% addLegend("bottomright", 
@@ -83,14 +97,14 @@ map <- map %>% addLegend("bottomright",
                          className = "legend-speed",
                          group = "speed")
 
-map <- map %>% addLegend("bottomright",
-                         title = "Variation in speeds <br>(standard deviation - m/s)",
-                         labFormat = labelFormat(suffix = " m/s"),
-                         pal = pal_sd,
-                         values = 0:5,
-                         opacity = 1,
-                         className = "legend-variation",
-                         group = "variation")
+# map <- map %>% addLegend("bottomright",
+#                          title = "Variation in speeds <br>(standard deviation - m/s)",
+#                          labFormat = labelFormat(suffix = " m/s"),
+#                          pal = pal_sd,
+#                          values = 0:5,
+#                          opacity = 1,
+#                          className = "legend-variation",
+#                          group = "variation")
 # map <- map %>% addLegend("bottomright", pal = pal_iqr, values = 0:8 , # title = "inter quartile range (m/sec)", 
 #                          opacity = 1,
 #                          className = "legend-iqr",
@@ -102,7 +116,7 @@ map <- map %>% addCircles(data = stops_0,
                           fill = NA,
                           opacity = 1,
                           color = "#444",
-                          group = "outbound stops")
+                          group = "southbound stops")
 
 map <- map %>% addCircles(data = stops_1,
                           label = ~htmlEscape(stop_name),
@@ -110,23 +124,27 @@ map <- map %>% addCircles(data = stops_1,
                           fill = NA,
                           opacity = 1,
                           color = "#444",
-                          group = "inbound stops")
+                          group = "northbound stops")
 
 map <- map  %>% addGroupedLayersControl(
-  overlayGroups = list(
-    "stops" = c("inbound stops", "outbound stops"),
-    "average speed" = c("speed", "am-peak", "pm-peak", "inter-peak", "early", "late"),
-    "speed variation" = c("variation", "peak")
-  )#,
-  # options = groupedLayersControlOptions(
-  #   groupCheckboxes = TRUE,
-  #   collapsed = FALSE,
-  #   groupsCollapsable = TRUE,
-  #   sortLayers = FALSE,
-  #   sortGroups = FALSE,
-  #   sortBaseLayers = FALSE,
-  #   exclusiveGroups = c("average speed","speed variation")
-  # )  
+      overlayGroups = list(
+        "stops" = 
+          c("southbound stops", "northbound stops"),
+        "average speed" = 
+          c("southbound", "northbound"
+                            #"am-peak", "pm-peak", "inter-peak", "early", "late"
+          )#,
+       # "speed variation" = c("variation", "peak")
+      ),
+      options = groupedLayersControlOptions(
+        groupCheckboxes = TRUE,
+        collapsed = FALSE,
+        groupsCollapsable = TRUE,
+        sortLayers = FALSE,
+        sortGroups = FALSE,
+        sortBaseLayers = FALSE,
+        exclusiveGroups = c("average speed","speed variation")
+      )
     )
 
 
