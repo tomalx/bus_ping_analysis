@@ -134,8 +134,8 @@ pings_seg_speed_0 <- pings_filtered_0 %>%
             speed_iqr = first(speed_iqr),
             speed_sd = first(speed_sd)) %>% 
   pivot_wider(names_from = time_period, names_glue = "speed_{time_period}",values_from = speed_50_tp) %>% 
-  left_join(route_split_1, by = c("seg_name" = "seg_name")) %>% 
-  mutate(direction_id = 1) %>% 
+  left_join(route_split_0, by = c("seg_name" = "seg_name")) %>% 
+  mutate(direction_id = 0) %>% 
   st_as_sf(crs = 27700) %>% 
   st_transform(4326)
 
