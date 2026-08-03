@@ -169,6 +169,8 @@ pings_seg_speed_1 <- pings_filtered_1 %>%
 # join inbound and outbound segs
 pings_seg_both_dir <- rbind(pings_seg_speed_0, pings_seg_speed_1)
 
+saveRDS(pings_seg_both_dir, file = paste0("rds/pings_seg_both_dir_",route_number,"_",route_id_filtered,".rds"))
+
 ##########################
 
 leaflet() %>% 

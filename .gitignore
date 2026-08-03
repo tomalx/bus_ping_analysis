@@ -51,10 +51,12 @@ rsconnect/
 ########
 csv/bus_loc_*.csv
 rds/bod*.rds
+rds/pings_seg_both_dir_*.rds
 parquet/
 html/
 qmd/
 gif/
+
 geojson/
 explore_pings/
 todo.txt
