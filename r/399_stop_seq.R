@@ -70,4 +70,4 @@ stop_seq <-
   stop_seq %>% 
   filter(shape_id %in% longest_stop_seq$shape_id)
 
-rm(unq_long_name, unq_route_id, n, route_number)
+rm(unq_long_name, unq_route_id, n)
