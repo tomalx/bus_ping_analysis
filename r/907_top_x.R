@@ -50,9 +50,10 @@ pal_speed_div <- colorNumeric(palette = prgn(6)[6:1], domain = -2:2)
 
 
 
-pings_seg_both_dir <- pings_seg_both_dir %>% 
-  mutate(speed_sd_scaled = rescale(speed_sd, to = c(2,10))) %>% 
-  mutate(speed_am_off_diff = speed_early_late - speed_am_peak)
+# pings_seg_both_dir <- pings_seg_both_dir %>% 
+#   mutate(speed_sd_scaled = rescale(speed_sd, to = c(2,10))) %>% 
+#   mutate(speed_am_v_qck = speed_early_late - speed_am_peak) %>% 
+#   mutate(speed_pm_v_qck = speed_early_late - speed_pm_peak)
 
 
 # library(sf)
@@ -98,7 +99,10 @@ pings_seg_both_dir_all <- pings_seg_both_dir_all %>%
   group_by(seg_name) %>% 
   slice(1) %>% 
   ungroup() %>% 
-  mutate(speed_am_off_diff = speed_early_late - speed_am_peak)
+  #mutate(speed_am_off_diff = speed_early_late - speed_am_peak) %>% 
+  mutate(speed_am_v_qck = speed_early_late - speed_am_peak) %>%
+  mutate(speed_pm_v_qck = speed_early_late - speed_pm_peak) %>% 
+  filter(dist_m_start > 10)
   
   #mutate(speed_50_scaled = rescale(speed_50, to = c(0,15)))
 
@@ -111,19 +115,26 @@ map <- leaflet() %>%
                   slice_min(speed_50, n = 20), 
                 # filter(direction_id == 0),  
                color = bright_pal[1], opacity = 1,
-               weight = 8,
+               weight = 5,
                popup = ~paste0("<b>",htmlEscape(seg_name),"</b>","<br>",
                                "average speed (all day): ", htmlEscape(round(speed_50,2)),"m/s","<br>",
                                "am peak average speed: ", htmlEscape(round(speed_am_peak,2)),"m/s","<br>",
                                "early/late average speed: ", htmlEscape(round(speed_early_late,2)),"m/s","<br>",
-                               "difference (early/late minus am peak): ", htmlEscape(round(speed_am_off_diff,2)),"m/s"),
+                               "difference between AM peak and early/late: ", htmlEscape(round(speed_am_v_qck,2)),"m/s","<br>",
+                               "difference between PM peak and early/late: ", htmlEscape(round(speed_pm_v_qck,2)),"m/s"),
                options = arrowheadOptions(
-                 yawn = 60,
+                 yawn = 40,
                  size = "20px",
                  frequency = '100px',
                  fill = TRUE,
-                 offsets = list('start' = '50px', 'end' = '50px'),
+                 offsets = list('start' = '30px', 'end' = '30px'),
                  perArrowheadOptions = NULL),
+               highlightOptions = highlightOptions(
+                 color = bright_pal[1],
+                 weight = 10,
+                 opacity = 0.5,
+                 bringToFront = TRUE
+               ),
                group = "slowest")
   
   # variance
@@ -131,44 +142,86 @@ map <- leaflet() %>%
                                  slice_max(speed_sd, n = 20), 
                                # filter(direction_id == 0),  
                                color = bright_pal[2], opacity = 1,
-                               weight = 8,
+                               weight = 5,
+                              
                                popup = ~paste0("<b>",htmlEscape(seg_name),"</b>","<br>",
                                                "average speed (all day): ", htmlEscape(round(speed_50,2)),"m/s","<br>",
                                                "am peak average speed: ", htmlEscape(round(speed_am_peak,2)),"m/s","<br>",
                                                "early/late average speed: ", htmlEscape(round(speed_early_late,2)),"m/s","<br>",
-                                               "difference (early/late minus am peak): ", htmlEscape(round(speed_am_off_diff,2)),"m/s"),
+                                               "difference between AM peak and early/late: ", htmlEscape(round(speed_am_v_qck,2)),"m/s","<br>",
+                                               "difference between PM peak and early/late: ", htmlEscape(round(speed_pm_v_qck,2)),"m/s"),
                                options = arrowheadOptions(
-                                 yawn = 60,
-                                 size = "20px",
-                                 frequency = '100px',
-                                 fill = TRUE,
-                                 offsets = list('start' = '50px', 'end' = '50px'),
-                                 perArrowheadOptions = list(
-                                   stroke = FALSE
-                                   )
-                                 ),
-                               group = "variance") 
-  
-  
-  # peak - off peak difference
-  map <- map %>%  addArrowhead(data = pings_seg_both_dir_all %>% 
-                                 slice_max(speed_am_off_diff, n = 20), 
-                               # filter(direction_id == 0),  
-                               color = bright_pal[3], opacity = 0.6,
-                               weight = 8,
-                               popup = ~paste0("<b>",htmlEscape(seg_name),"</b>","<br>",
-                                               "average speed (all day): ", htmlEscape(round(speed_50,2)),"m/s","<br>",
-                                               "am peak average speed: ", htmlEscape(round(speed_am_peak,2)),"m/s","<br>",
-                                               "early/late average speed: ", htmlEscape(round(speed_early_late,2)),"m/s","<br>",
-                                               "difference (early/late minus am peak): ", htmlEscape(round(speed_am_off_diff,2)),"m/s"),
-                               options = arrowheadOptions(
-                                 yawn = 60,
+                                 yawn = 40,
                                  size = "20px",
                                  frequency = '100px',
                                  fill = TRUE,
                                  offsets = list('start' = '50px', 'end' = '50px'),
                                  perArrowheadOptions = NULL),
-                               group = "peak/off-peak difference") 
+                               highlightOptions = highlightOptions(
+                                 color = bright_pal[2],
+                                 weight = 10,
+                                 opacity = 0.5,
+                                 bringToFront = TRUE
+                               ),
+                              #options = list(offset = 3),
+                               
+                               group = "most variable") 
+  
+  
+  # peak - off peak difference
+  map <- map %>%  addArrowhead(data = pings_seg_both_dir_all %>% 
+                                 slice_max(speed_am_v_qck, n = 20), 
+                               # filter(direction_id == 0),  
+                               color = bright_pal[3], opacity = 1,
+                               weight = 5,
+                               popup = ~paste0("<b>",htmlEscape(seg_name),"</b>","<br>",
+                                               "average speed (all day): ", htmlEscape(round(speed_50,2)),"m/s","<br>",
+                                               "am peak average speed: ", htmlEscape(round(speed_am_peak,2)),"m/s","<br>",
+                                               "early/late average speed: ", htmlEscape(round(speed_early_late,2)),"m/s","<br>",
+                                               "difference between AM peak and early/late: ", htmlEscape(round(speed_am_v_qck,2)),"m/s","<br>",
+                                               "difference between PM peak and early/late: ", htmlEscape(round(speed_pm_v_qck,2)),"m/s"),
+                               options = arrowheadOptions(
+                                 yawn = 40,
+                                 size = "20px",
+                                 frequency = '100px',
+                                 fill = TRUE,
+                                 offsets = list('start' = '70px', 'end' = '70px'),
+                                 perArrowheadOptions = NULL),
+                               highlightOptions = highlightOptions(
+                                 color = bright_pal[3],
+                                 weight = 10,
+                                 opacity = 0.5,
+                                 bringToFront = TRUE
+                               ),
+                               group = "AM peak (difference v early/late)") 
+  
+  
+  # peak - off peak difference
+  map <- map %>%  addArrowhead(data = pings_seg_both_dir_all %>% 
+                                 slice_max(speed_pm_v_qck, n = 20), 
+                               # filter(direction_id == 0),  
+                               color = bright_pal[4], opacity = 1,
+                               weight = 5,
+                               popup = ~paste0("<b>",htmlEscape(seg_name),"</b>","<br>",
+                                               "average speed (all day): ", htmlEscape(round(speed_50,2)),"m/s","<br>",
+                                               "am peak average speed: ", htmlEscape(round(speed_am_peak,2)),"m/s","<br>",
+                                               "early/late average speed: ", htmlEscape(round(speed_early_late,2)),"m/s","<br>",
+                                               "difference between AM peak and early/late: ", htmlEscape(round(speed_am_v_qck,2)),"m/s","<br>",
+                                               "difference between PM peak and early/late: ", htmlEscape(round(speed_pm_v_qck,2)),"m/s"),
+                               options = arrowheadOptions(
+                                 yawn = 40,
+                                 size = "20px",
+                                 frequency = '100px',
+                                 fill = TRUE,
+                                 offsets = list('start' = '25px', 'end' = '35px'),
+                                 perArrowheadOptions = NULL),
+                               highlightOptions = highlightOptions(
+                                 color = bright_pal[4],
+                                 weight = 10,
+                                 opacity = 0.5,
+                                 bringToFront = TRUE
+                                 ),
+                               group = "PM peak (difference v early/late)") 
   
   # southbound am-off difference
   # map <- map %>%  addArrowhead(data = pings_seg_both_dir %>% 
@@ -239,9 +292,13 @@ map <- map %>% addPolylines(data = schemes %>% filter(intervention_type == "rout
 map <- map  %>% addGroupedLayersControl(
       overlayGroups = list(
         "stops & schemes" =
-          c("southbound stops", "northbound stops","schemes"),
+          c(#"southbound stops", 
+            #"northbound stops",
+            "schemes"),
         "top/bottom ranked stop to stop segments" = 
-          c("slowest","variance","peak/off-peak difference"
+          c("slowest","most variable",
+            "AM peak (difference v early/late)",
+            "PM peak (difference v early/late)"
           )#,
        # "speed variation" = c("variation", "peak")
       ),
@@ -257,76 +314,100 @@ map <- map  %>% addGroupedLayersControl(
     )
 
 
-# legend_html <- "
-# <div style='background:white; padding:10px; border-radius:5px;'>
-#   <b>Flow Direction</b><br>
-#   <span style='color:#2B6CB0; font-size:20px;'>➜</span>
-#   Blue Route<br>
-#   <span style='color:#F5658A; font-size:20px;'>➜</span>
-#   Pink Route<br>
-#   <span style='color:#38A169; font-size:20px;'>➜</span>
-#   Green Route
-# </div>
-# "
-
-
-
-# legend_html <- sprintf("
-# <div style='background:white; padding:10px; border-radius:5px;'>
-#   <b>Flow Direction</b><br>
-#   <span style='color:%s; font-size:24px;'>&#10148;</span>
-#   slowest<br>
-#   <span style='color:%s; font-size:24px;'>&#10148;</span>
-#   variance<br>
-#   <span style='color:%s; font-size:24px;'>&#10148;</span>
-#   am peak - early/late difference
-# </div>
-# ",
-# bright_pal[1], bright_pal[2], bright_pal[3]
-# )
-
-"#4477AA"
 
 legend_html <- sprintf("
 <div style='background:white;
             padding:10px;
             border-radius:5px;'>
 
-<b>Route Flows</b><br>
+<div style='display:flex; align-items:center; margin-bottom:4px;'>
+  <svg width='80' height='20'>
+   <rect x='0' y='6.5'
+          width='55' height='5'
+          rx='2' ry='2'
+          fill='%s'
+          fill-opacity='1'/>
+<path d='
+    M20 2
+    Q21 1 22 2
+    L36 9
+    L22 16
+    Q21 17 20 16
+    Z'
+      fill='%s'
+      stroke='%s'
+      stroke-width='1'/>
+  <span>slowest</span>
+</div>
 
-<svg width='80' height='20'>
- <rect x='0' y='6.5'
-  width='55' height='7'
-  fill='#4477AA'
-  fill-opacity='1' />
-  <polygon points='45,2 60,10 45,18'
-           fill='%s' fill-opacity='0.75'/>
-</svg> slowest<br>
+<div style='display:flex; align-items:center; margin-bottom:4px;'>
+  <svg width='80' height='20'>
+   <rect x='0' y='6.5'
+          width='55' height='5'
+          rx='2' ry='2'
+          fill='%s'
+          fill-opacity='1'/>
+<path d='
+    M20 2
+    Q21 1 22 2
+    L36 9
+    L22 16
+    Q21 17 20 16
+    Z'
+      fill='%s'
+      stroke='%s'
+      stroke-width='1'/>
+  <span>most variable</span>
+</div>
 
-<svg width='80' height='20'>
-  <line x1='0' y1='10' x2='55' y2='10'
-        stroke='%s' stroke-width='6'
-        stroke-opacity='0.6'/>
-  <polygon points='45,2 60,10 45,18'
-           fill='%s' fill-opacity='0.75'/>
-</svg> variance<br>
+<div style='display:flex; align-items:center; margin-bottom:4px;'>
+  <svg width='80' height='20'>
+   <rect x='0' y='6.5'
+          width='55' height='5'
+          rx='2' ry='2'
+          fill='%s'
+          fill-opacity='1'/>
+<path d='
+    M20 2
+    Q21 1 22 2
+    L36 9
+    L22 16
+    Q21 17 20 16
+    Z'
+      fill='%s'
+      stroke='%s'
+      stroke-width='1'/>
+  <span>AM peak (difference v early/late)</span>
+</div>
 
-<svg width='80' height='20'>
-  <line x1='0' y1='10' x2='55' y2='10'
-        stroke='%s' stroke-width='6'
-        stroke-opacity='0.6'/>
-  <polygon points='30,2 45,10 30,18'
-           fill='%s' fill-opacity='0.75'/>
-</svg> am peak - early/late difference
+<div style='display:flex; align-items:center; margin-bottom:4px;'>
+  <svg width='80' height='20'>
+   <rect x='0' y='6.5'
+          width='55' height='5'
+          rx='2' ry='2'
+          fill='%s'
+          fill-opacity='1'/>
+<path d='
+    M20 2
+    Q21 1 22 2
+    L36 9
+    L22 16
+    Q21 17 20 16
+    Z'
+      fill='%s'
+      stroke='%s'
+      stroke-width='1'/>
+  <span>PM peak (difference v early/late)</span>
+</div>
+
 
 </div>
 ",
-bright_pal[1], bright_pal[1],
-bright_pal[2], bright_pal[2],
-bright_pal[3], bright_pal[3]
+bright_pal[1], bright_pal[1], bright_pal[1],
+bright_pal[2], bright_pal[2],  bright_pal[2],
+bright_pal[3], bright_pal[3], bright_pal[3],
+bright_pal[4], bright_pal[4], bright_pal[4]
 )
-
-
 
 
 
