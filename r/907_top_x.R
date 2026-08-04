@@ -168,38 +168,38 @@ map <- leaflet() %>%
                                group = "peak/off-peak difference") 
   
   # southbound am-off difference
-  map <- map %>%  addArrowhead(data = pings_seg_both_dir %>% 
-                                 # slice_min(speed_50, n = 20), 
-                                 filter(direction_id == 1),  
-                               color = ~pal_speed_div(speed_am_off_diff), opacity = 1,
-                               weight = 5,
-                               popup = ~paste0("<b>",htmlEscape(seg_name),"</b>","<br>",
-                                               "average speed (all day): ", htmlEscape(round(speed_50,2)),"m/s","<br>",
-                                               "am peak average speed: ", htmlEscape(round(speed_am_peak,2)),"m/s","<br>",
-                                               "early/late average speed: ", htmlEscape(round(speed_early_late,2)),"m/s","<br>",
-                                               "difference (early/late minus am peak): ", htmlEscape(round(speed_am_off_diff,2)),"m/s"),
-                               options = arrowheadOptions(
-                                 yawn = 60,
-                                 size = "20px",
-                                 frequency = '100px',
-                                 fill = TRUE,
-                                 offsets = list('start' = '50px', 'end' = '50px'),
-                                 perArrowheadOptions = NULL),
-                               group = "northbound") 
-  
+  # map <- map %>%  addArrowhead(data = pings_seg_both_dir %>% 
+  #                                # slice_min(speed_50, n = 20), 
+  #                                filter(direction_id == 1),  
+  #                              color = ~pal_speed_div(speed_am_off_diff), opacity = 1,
+  #                              weight = 5,
+  #                              popup = ~paste0("<b>",htmlEscape(seg_name),"</b>","<br>",
+  #                                              "average speed (all day): ", htmlEscape(round(speed_50,2)),"m/s","<br>",
+  #                                              "am peak average speed: ", htmlEscape(round(speed_am_peak,2)),"m/s","<br>",
+  #                                              "early/late average speed: ", htmlEscape(round(speed_early_late,2)),"m/s","<br>",
+  #                                              "difference (early/late minus am peak): ", htmlEscape(round(speed_am_off_diff,2)),"m/s"),
+  #                              options = arrowheadOptions(
+  #                                yawn = 60,
+  #                                size = "20px",
+  #                                frequency = '100px',
+  #                                fill = TRUE,
+  #                                offsets = list('start' = '50px', 'end' = '50px'),
+  #                                perArrowheadOptions = NULL),
+  #                              group = "northbound") 
+  # 
   
   
 
-map <- map %>% addLegend("bottomright", 
-                         title = "Average Speed Difference (m/s) <br>
-                         am peak v early/late",
-                         labFormat = labelFormat(suffix = " m/s"),
-                         pal = pal_speed_div, values = -2:2 , #title = "Average Speed (m/sec)", 
-                         opacity = 1,
-                         className = "legend-speed"#,
-                         #group = "speed"
-                         )
- 
+# map <- map %>% addLegend("bottomright", 
+#                          title = "Average Speed Difference (m/s) <br>
+#                          am peak v early/late",
+#                          labFormat = labelFormat(suffix = " m/s"),
+#                          pal = pal_speed_div, values = -2:2 , #title = "Average Speed (m/sec)", 
+#                          opacity = 1,
+#                          className = "legend-speed"#,
+#                          #group = "speed"
+#                          )
+#  
 
 # map <- map %>% addLegend("bottomright",
 #                          title = "Variation in speeds <br>(standard deviation - m/s)",
@@ -214,29 +214,29 @@ map <- map %>% addLegend("bottomright",
 #                          className = "legend-iqr",
 #                          group = "iqr")
 
-map <- map %>% addCircles(data = stops_0,
-                          label = ~htmlEscape(stop_name),
-                          radius = 2,
-                          fill = NA,
-                          opacity = 1,
-                          color = "#444",
-                          group = "southbound stops")
-
-map <- map %>% addCircles(data = stops_1,
-                          label = ~htmlEscape(stop_name),
-                          radius = 2,
-                          fill = NA,
-                          opacity = 1,
-                          color = "#444",
-                          group = "northbound stops")
+# map <- map %>% addCircles(data = stops_0,
+#                           label = ~htmlEscape(stop_name),
+#                           radius = 2,
+#                           fill = NA,
+#                           opacity = 1,
+#                           color = "#444",
+#                           group = "southbound stops")
+# 
+# map <- map %>% addCircles(data = stops_1,
+#                           label = ~htmlEscape(stop_name),
+#                           radius = 2,
+#                           fill = NA,
+#                           opacity = 1,
+#                           color = "#444",
+#                           group = "northbound stops")
 
 map <- map %>% addPolygons(data = schemes %>% filter(intervention_type == "area"), color = "#555555", weight = NA, popup = ~name, group = "schemes")
 map <- map %>% addPolylines(data = schemes %>% filter(intervention_type == "route"),  color = "#555555", popup = ~name, group = "schemes")
 
 map <- map  %>% addGroupedLayersControl(
       overlayGroups = list(
-        # "stops & schemes" = 
-        #   c("southbound stops", "northbound stops","schemes"),
+        "stops & schemes" =
+          c("southbound stops", "northbound stops","schemes"),
         "top/bottom ranked stop to stop segments" = 
           c("slowest","variance","peak/off-peak difference"
           )#,
@@ -248,12 +248,12 @@ map <- map  %>% addGroupedLayersControl(
         groupsCollapsable = FALSE,
         sortLayers = FALSE,
         sortGroups = FALSE,
-        sortBaseLayers = FALSE,
-        exclusiveGroups = c("top/bottom ranked stop to stop segments")
+        sortBaseLayers = FALSE#,
+        #exclusiveGroups = c("top/bottom ranked stop to stop segments")
       )
     )
 
-map %>% hideGroup(c("variance", "peak/off-peak difference"))
+map %>% hideGroup(c("schemes"))
 map
 # map %>% htmlwidgets::onRender("
 # function(el, x) {
