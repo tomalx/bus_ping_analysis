@@ -2,6 +2,7 @@
 library(leaflet.extras) # for grouped layers control
 library(leaflet.extras2) # for arrowheads function
 library(htmltools)
+library(purrr)
 
 schemes <- st_read(choose.files())
 
@@ -54,12 +55,50 @@ pings_seg_both_dir <- pings_seg_both_dir %>%
   mutate(speed_am_off_diff = speed_early_late - speed_am_peak)
 
 
-pings_seg_both_dir_all <- rbind(pings_seg_both_dir_all, pings_seg_both_dir)
+# library(sf)
+# library(dplyr)
+# library(purrr)
+
+pings_seg_both_dir_all <- list.files(
+  path = "rds",
+  pattern = "^pings_seg.*\\.rds$",
+  full.names = TRUE
+) #|>
+  # map(readRDS) |>
+  # list_rbind()
+
+# Print files
+for (i in seq_along(pings_seg_both_dir_all)) {
+  cat(sprintf("[%i] %s\n", i, basename(pings_seg_both_dir_all[i])))
+}
+
+# Specify files to exclude
+exclude <- c( 5)
+
+# Remove them
+pings_seg_both_dir_all <- pings_seg_both_dir_all[-exclude]
+
+# Check what's left
+print(basename(pings_seg_both_dir_all))
+
+# Read and combine
+pings_seg_both_dir_all <- pings_seg_both_dir_all %>% 
+  map(readRDS) %>% 
+  list_rbind()
+
+# convert to sf
+pings_seg_both_dir_all <- pings_seg_both_dir_all %>%
+  st_as_sf(crs = 4326)
+  
+
+
+# pings_seg_both_dir_all <- rbind(pings_seg_both_dir_all, pings_seg_both_dir)
 
 pings_seg_both_dir_all <- pings_seg_both_dir_all %>% 
   group_by(seg_name) %>% 
   slice(1) %>% 
-  ungroup()
+  ungroup() %>% 
+  mutate(speed_am_off_diff = speed_early_late - speed_am_peak)
   
   #mutate(speed_50_scaled = rescale(speed_50, to = c(0,15)))
 
@@ -215,7 +254,7 @@ map <- map  %>% addGroupedLayersControl(
     )
 
 map %>% hideGroup(c("variance", "peak/off-peak difference"))
-
+map
 # map %>% htmlwidgets::onRender("
 # function(el, x) {
 # 
