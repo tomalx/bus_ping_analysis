@@ -73,7 +73,7 @@ for (i in seq_along(pings_seg_both_dir_all)) {
 }
 
 # Specify files to exclude
-exclude <- c( 5)
+exclude <- c( 6)
 
 # Remove them
 pings_seg_both_dir_all <- pings_seg_both_dir_all[-exclude]
@@ -110,7 +110,7 @@ map <- leaflet() %>%
   map <- map %>%  addArrowhead(data = pings_seg_both_dir_all %>% 
                   slice_min(speed_50, n = 20), 
                 # filter(direction_id == 0),  
-               color = bright_pal[1], opacity = 0.6,
+               color = bright_pal[1], opacity = 1,
                weight = 8,
                popup = ~paste0("<b>",htmlEscape(seg_name),"</b>","<br>",
                                "average speed (all day): ", htmlEscape(round(speed_50,2)),"m/s","<br>",
@@ -130,7 +130,7 @@ map <- leaflet() %>%
   map <- map %>%  addArrowhead(data = pings_seg_both_dir_all %>% 
                                  slice_max(speed_sd, n = 20), 
                                # filter(direction_id == 0),  
-                               color = bright_pal[2], opacity = 0.6,
+                               color = bright_pal[2], opacity = 1,
                                weight = 8,
                                popup = ~paste0("<b>",htmlEscape(seg_name),"</b>","<br>",
                                                "average speed (all day): ", htmlEscape(round(speed_50,2)),"m/s","<br>",
@@ -143,7 +143,10 @@ map <- leaflet() %>%
                                  frequency = '100px',
                                  fill = TRUE,
                                  offsets = list('start' = '50px', 'end' = '50px'),
-                                 perArrowheadOptions = NULL),
+                                 perArrowheadOptions = list(
+                                   stroke = FALSE
+                                   )
+                                 ),
                                group = "variance") 
   
   
@@ -252,6 +255,88 @@ map <- map  %>% addGroupedLayersControl(
         #exclusiveGroups = c("top/bottom ranked stop to stop segments")
       )
     )
+
+
+# legend_html <- "
+# <div style='background:white; padding:10px; border-radius:5px;'>
+#   <b>Flow Direction</b><br>
+#   <span style='color:#2B6CB0; font-size:20px;'>➜</span>
+#   Blue Route<br>
+#   <span style='color:#F5658A; font-size:20px;'>➜</span>
+#   Pink Route<br>
+#   <span style='color:#38A169; font-size:20px;'>➜</span>
+#   Green Route
+# </div>
+# "
+
+
+
+# legend_html <- sprintf("
+# <div style='background:white; padding:10px; border-radius:5px;'>
+#   <b>Flow Direction</b><br>
+#   <span style='color:%s; font-size:24px;'>&#10148;</span>
+#   slowest<br>
+#   <span style='color:%s; font-size:24px;'>&#10148;</span>
+#   variance<br>
+#   <span style='color:%s; font-size:24px;'>&#10148;</span>
+#   am peak - early/late difference
+# </div>
+# ",
+# bright_pal[1], bright_pal[2], bright_pal[3]
+# )
+
+"#4477AA"
+
+legend_html <- sprintf("
+<div style='background:white;
+            padding:10px;
+            border-radius:5px;'>
+
+<b>Route Flows</b><br>
+
+<svg width='80' height='20'>
+ <rect x='0' y='6.5'
+  width='55' height='7'
+  fill='#4477AA'
+  fill-opacity='1' />
+  <polygon points='45,2 60,10 45,18'
+           fill='%s' fill-opacity='0.75'/>
+</svg> slowest<br>
+
+<svg width='80' height='20'>
+  <line x1='0' y1='10' x2='55' y2='10'
+        stroke='%s' stroke-width='6'
+        stroke-opacity='0.6'/>
+  <polygon points='45,2 60,10 45,18'
+           fill='%s' fill-opacity='0.75'/>
+</svg> variance<br>
+
+<svg width='80' height='20'>
+  <line x1='0' y1='10' x2='55' y2='10'
+        stroke='%s' stroke-width='6'
+        stroke-opacity='0.6'/>
+  <polygon points='30,2 45,10 30,18'
+           fill='%s' fill-opacity='0.75'/>
+</svg> am peak - early/late difference
+
+</div>
+",
+bright_pal[1], bright_pal[1],
+bright_pal[2], bright_pal[2],
+bright_pal[3], bright_pal[3]
+)
+
+
+
+
+
+map <- map |>
+  addControl(
+    html = legend_html,
+    position = "bottomright"
+  )
+
+
 
 map %>% hideGroup(c("schemes"))
 map
