@@ -25,7 +25,7 @@ for( n in 1:nrow(dc_routes)){
   cat(n," ---->    ",dc_routes$route_short_name[n]," ", dc_routes$route_long_name[n],"\n")
 }
 
-dc_routes <- dc_routes[2]  ## WARNING ## need to specify row(s) in square brackets
+dc_routes <- dc_routes[1]  ## WARNING ## need to specify row(s) in square brackets
 
 dc_routes <- dc_routes %>% 
   left_join(gtfs_sf$trips, by = "route_id") %>% 

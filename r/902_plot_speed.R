@@ -1,4 +1,6 @@
 ## plot ping speed
+library(tidyr)
+library(hms)
 
 # stops with dist_m
 stops_0 <- stop_seq %>% 
@@ -123,11 +125,32 @@ pings_seg_speed_0 <- pings_filtered_0 %>%
   mutate(speed_50 = mean(ping_speed),
          speed_iqr = IQR(ping_speed),
          speed_sd = sd(ping_speed)) %>% 
-  mutate(time_period = case_when(hour(time) %in% c(8,9) ~ "am_peak",
-                                 hour(time) %in% c(17,18) ~ "pm_peak",
-                                 hour(time) %in% c(10,11,12,13,14,15,16) ~ "inter_peak",
-                                 .default = "early_late")
-  ) %>%
+  # mutate(time_period = case_when(hour(time) %in% c(8) ~ "am_peak",
+  #                                hour(time) %in% c(17,18) ~ "pm_peak",
+  #                                hour(time) %in% c(10,11,12,13,14,15,16) ~ "inter_peak",
+  #                                .default = "early_late")
+  # ) %>%
+  
+  mutate(
+    time = hms::as_hms(time),
+    
+    time_period = case_when(
+      time >= as_hms("07:30:00") &
+      time < as_hms("09:00:00") ~ "am_peak",
+      
+      time >= as_hms("10:00:00") &
+      time < as_hms("17:00:00") ~ "inter_peak",
+      
+      time >= as_hms("17:00:00") &
+      time < as_hms("19:00:00") ~ "pm_peak",
+      
+      TRUE ~ "early_late")
+      
+    ) %>% 
+    
+  
+  
+  
   group_by(seg_name, time_period) %>% 
   summarise(speed_50_tp = mean(ping_speed),
             speed_50 = first(speed_50),
@@ -147,11 +170,29 @@ pings_seg_speed_1 <- pings_filtered_1 %>%
   mutate(speed_50 = mean(ping_speed),
             speed_iqr = IQR(ping_speed),
             speed_sd = sd(ping_speed)) %>% 
-  mutate(time_period = case_when(hour(time) %in% c(8,9) ~ "am_peak",
-                                 hour(time) %in% c(17,18) ~ "pm_peak",
-                                 hour(time) %in% c(10,11,12,13,14,15,16) ~ "inter_peak",
-                                 .default = "early_late")
-         ) %>%
+  # mutate(time_period = case_when(hour(time) %in% c(8,9) ~ "am_peak",
+  #                                hour(time) %in% c(17,18) ~ "pm_peak",
+  #                                hour(time) %in% c(10,11,12,13,14,15,16) ~ "inter_peak",
+  #                                .default = "early_late")
+  #        ) %>%
+  
+  mutate(
+    time = hms::as_hms(time),
+    
+    time_period = case_when(
+      time >= as_hms("07:30:00") &
+        time < as_hms("09:00:00") ~ "am_peak",
+      
+      time >= as_hms("09:00:00") &
+        time < as_hms("16:00:00") ~ "inter_peak",
+      
+      time >= as_hms("16:00:00") &
+        time < as_hms("18:00:00") ~ "pm_peak",
+      
+      TRUE ~ "early_late")
+    
+  ) %>% 
+  
   group_by(seg_name, time_period) %>% 
   summarise(speed_50_tp = mean(ping_speed),
             speed_50 = first(speed_50),
@@ -168,6 +209,8 @@ pings_seg_speed_1 <- pings_filtered_1 %>%
 
 # join inbound and outbound segs
 pings_seg_both_dir <- rbind(pings_seg_speed_0, pings_seg_speed_1)
+pings_seg_both_dir <- pings_seg_both_dir %>% 
+  mutate(route_id = route_id_filtered)
 
 saveRDS(pings_seg_both_dir, file = paste0("rds/pings_seg_both_dir_",route_number,"_",route_id_filtered,".rds"))
 

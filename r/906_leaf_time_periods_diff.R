@@ -2,6 +2,7 @@
 library(leaflet.extras) # for grouped layers control
 library(leaflet.extras2) # for arrowheads function
 library(htmltools)
+library(scales)
 
 schemes <- st_read(choose.files())
 
@@ -73,7 +74,7 @@ map <- leaflet() %>%
                  fill = TRUE,
                  offsets = list('start' = '50px', 'end' = '50px'),
                  perArrowheadOptions = NULL),
-               group = "southbound") 
+               group = "outbound") 
   
   # southbound am-off difference
   map <- map %>%  addArrowhead(data = pings_seg_both_dir %>% 
@@ -93,7 +94,7 @@ map <- leaflet() %>%
                                  fill = TRUE,
                                  offsets = list('start' = '50px', 'end' = '50px'),
                                  perArrowheadOptions = NULL),
-                               group = "northbound") 
+                               group = "inbound") 
   
   
   
@@ -128,7 +129,7 @@ map <- map %>% addCircles(data = stops_0,
                           fill = NA,
                           opacity = 1,
                           color = "#444",
-                          group = "southbound stops")
+                          group = "outbound stops")
 
 map <- map %>% addCircles(data = stops_1,
                           label = ~htmlEscape(stop_name),
@@ -136,7 +137,7 @@ map <- map %>% addCircles(data = stops_1,
                           fill = NA,
                           opacity = 1,
                           color = "#444",
-                          group = "northbound stops")
+                          group = "inbound stops")
 
 map <- map %>% addPolygons(data = schemes %>% filter(intervention_type == "area"), color = "#555555", weight = NA, popup = ~name, group = "schemes")
 map <- map %>% addPolylines(data = schemes %>% filter(intervention_type == "route"),  color = "#555555", popup = ~name, group = "schemes")
@@ -144,9 +145,9 @@ map <- map %>% addPolylines(data = schemes %>% filter(intervention_type == "rout
 map <- map  %>% addGroupedLayersControl(
       overlayGroups = list(
         "stops & schemes" = 
-          c("southbound stops", "northbound stops","schemes"),
+          c("outbound stops", "inbound stops","schemes"),
         "average speed difference" = 
-          c("southbound","northbound"
+          c("outbound","inbound"
           )#,
        # "speed variation" = c("variation", "peak")
       ),
@@ -161,7 +162,7 @@ map <- map  %>% addGroupedLayersControl(
       )
     )
 
-map %>% hideGroup(c("schemes", "northbound stops", "southbound stops"))
+map %>% hideGroup(c("schemes", "outbound stops", "inbound stops"))
 
 # map %>% htmlwidgets::onRender("
 # function(el, x) {
