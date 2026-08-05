@@ -75,6 +75,7 @@ pings_1 <- pings_1 %>%
 
 
 pings <- rbind(pings_0,pings_1)
+if(!exists("pings_1")){pings <- pings_0}
 
 pings <- pings %>% unique_trip_OD()
 #glimpse(test_pings)

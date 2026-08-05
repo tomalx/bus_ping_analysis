@@ -4,7 +4,7 @@ library(leaflet.extras2) # for arrowheads function
 library(htmltools)
 library(scales)
 
-schemes <- st_read(choose.files())
+# schemes <- st_read(choose.files())
 
 ### To Do : -> -> -> -> 
 ###        segment by length
@@ -21,17 +21,17 @@ schemes <- st_read(choose.files())
 # seg_sd_speed <- pings_seg_both_dir %>%
 #   slice_max(speed_sd,n = 20)
 
-top_n <- 20
+# top_n <- 20
 
 #speed palette
-incandescent <- khroma::color("incandescent")
-incandescent(6)[6:1]
+# incandescent <- khroma::color("incandescent")
+# incandescent(6)[6:1]
 
 #speed palette
 prgn <- khroma::color("PRGn")
 prgn(6)[6:1]
-khroma::plot_scheme(prgn(6))
-khroma::plot_scheme_colourblind(prgn(6))
+# khroma::plot_scheme(prgn(6))
+# khroma::plot_scheme_colourblind(prgn(6))
 
 # burg <- unname(
 #   as.character(
@@ -39,16 +39,17 @@ khroma::plot_scheme_colourblind(prgn(6))
 #   )
 # )
 
-pal_speed <- colorNumeric(palette = incandescent(6)[6:1], domain = 0:12)
+# pal_speed <- colorNumeric(palette = incandescent(6)[6:1], domain = 0:12)
 #pal_iqr <- colorNumeric(palette = burg, domain = 0:8)
 #pal_sd <- colorNumeric(palette = burg, domain = 0:5)
-pal_speed_div <- colorNumeric(palette = prgn(6)[6:1], domain = -2:2)
+pal_speed_div <- colorNumeric(palette = prgn(6)[6:1], domain = -3:3)
 
 
 
 pings_seg_both_dir <- pings_seg_both_dir %>% 
   mutate(speed_sd_scaled = rescale(speed_sd, to = c(2,10))) %>% 
-  mutate(speed_am_off_diff = speed_early_late - speed_am_peak)
+  mutate(speed_am_off_diff = speed_early_late - speed_am_peak) %>% 
+  mutate(speed_am_off_diff_cap = pmin(speed_am_off_diff, 3))
   
   #mutate(speed_50_scaled = rescale(speed_50, to = c(0,15)))
 
@@ -60,7 +61,7 @@ map <- leaflet() %>%
   map <- map %>%  addArrowhead(data = pings_seg_both_dir %>% 
                  # slice_min(speed_50, n = 20), 
                  filter(direction_id == 0),  
-               color = ~pal_speed_div(speed_am_off_diff), opacity = 1,
+               color = ~pal_speed_div(speed_am_off_diff_cap), opacity = 1,
                weight = 5,
                popup = ~paste0("<b>",htmlEscape(seg_name),"</b>","<br>",
                                "average speed (all day): ", htmlEscape(round(speed_50,2)),"m/s","<br>",
@@ -80,7 +81,7 @@ map <- leaflet() %>%
   map <- map %>%  addArrowhead(data = pings_seg_both_dir %>% 
                                  # slice_min(speed_50, n = 20), 
                                  filter(direction_id == 1),  
-                               color = ~pal_speed_div(speed_am_off_diff), opacity = 1,
+                               color = ~pal_speed_div(speed_am_off_diff_cap), opacity = 1,
                                weight = 5,
                                popup = ~paste0("<b>",htmlEscape(seg_name),"</b>","<br>",
                                                "average speed (all day): ", htmlEscape(round(speed_50,2)),"m/s","<br>",
@@ -103,7 +104,7 @@ map <- map %>% addLegend("bottomright",
                          title = "Average Speed Difference (m/s) <br>
                          am peak v early/late",
                          labFormat = labelFormat(suffix = " m/s"),
-                         pal = pal_speed_div, values = -2:2 , #title = "Average Speed (m/sec)", 
+                         pal = pal_speed_div, values = -3:3 , #title = "Average Speed (m/sec)", 
                          opacity = 1,
                          className = "legend-speed"#,
                          #group = "speed"
@@ -139,13 +140,14 @@ map <- map %>% addCircles(data = stops_1,
                           color = "#444",
                           group = "inbound stops")
 
-map <- map %>% addPolygons(data = schemes %>% filter(intervention_type == "area"), color = "#555555", weight = NA, popup = ~name, group = "schemes")
-map <- map %>% addPolylines(data = schemes %>% filter(intervention_type == "route"),  color = "#555555", popup = ~name, group = "schemes")
+#map <- map %>% addPolygons(data = schemes %>% filter(intervention_type == "area"), color = "#555555", weight = NA, popup = ~name, group = "schemes")
+#map <- map %>% addPolylines(data = schemes %>% filter(intervention_type == "route"),  color = "#555555", popup = ~name, group = "schemes")
 
 map <- map  %>% addGroupedLayersControl(
       overlayGroups = list(
         "stops & schemes" = 
-          c("outbound stops", "inbound stops","schemes"),
+          c("outbound stops", "inbound stops"#"schemes"
+            ),
         "average speed difference" = 
           c("outbound","inbound"
           )#,
