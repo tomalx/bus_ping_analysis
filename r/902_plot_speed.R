@@ -155,7 +155,8 @@ pings_seg_speed_0 <- pings_filtered_0 %>%
   summarise(speed_50_tp = mean(ping_speed),
             speed_50 = first(speed_50),
             speed_iqr = first(speed_iqr),
-            speed_sd = first(speed_sd)) %>% 
+            speed_sd = first(speed_sd),
+            .groups = "drop_last") %>% 
   pivot_wider(names_from = time_period, names_glue = "speed_{time_period}",values_from = speed_50_tp) %>% 
   left_join(route_split_0, by = c("seg_name" = "seg_name")) %>% 
   mutate(direction_id = 0) %>% 
@@ -197,7 +198,8 @@ pings_seg_speed_1 <- pings_filtered_1 %>%
   summarise(speed_50_tp = mean(ping_speed),
             speed_50 = first(speed_50),
             speed_iqr = first(speed_iqr),
-            speed_sd = first(speed_sd)) %>% 
+            speed_sd = first(speed_sd),
+            .groups = "drop_last") %>% 
   pivot_wider(names_from = time_period, names_glue = "speed_{time_period}",values_from = speed_50_tp) %>% 
   
   # pivot wider here : aim cols of time period speed

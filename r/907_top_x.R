@@ -4,7 +4,45 @@ library(leaflet.extras2) # for arrowheads function
 library(htmltools)
 library(purrr)
 
-schemes <- st_read(choose.files())
+schemes_bcc <- st_read(choose.files()) 
+schemes_somval_1 <- st_read(choose.files())
+schemes_somval_2 <- st_read(choose.files())
+schemes_banes <- st_read(choose.files())
+schemes_nsc <- st_read(choose.files())
+schemes_sgc <- st_read(choose.files())
+
+schemes <- list(schemes_bcc, schemes_somval_1, schemes_somval_2,
+                schemes_banes, schemes_nsc, schemes_sgc)
+
+names(schemes_bcc) <- tolower(names(schemes_bcc))
+names(schemes_somval_1) <- tolower(names(schemes_somval_1))
+names(schemes_somval_2) <- tolower(names(schemes_somval_2))
+names(schemes_banes) <- tolower(names(schemes_banes))
+names(schemes_nsc) <- tolower(names(schemes_nsc))
+names(schemes_sgc) <- tolower(names(schemes_sgc))
+                              
+schemes_bcc <- schemes_bcc %>% select(name, description)
+schemes_somval_1 <- schemes_somval_1 %>% select(name, description)
+schemes_somval_2 <- schemes_somval_2 %>% select(name, description)
+schemes_banes <- schemes_banes %>% select(name, description)
+schemes_nsc <- schemes_nsc %>% select(name, description)
+schemes_sgc <- schemes_sgc %>% select(name, description)
+
+schemes_bcc <- schemes_bcc %>% st_make_valid() %>% st_buffer(10)
+schemes_somval_1 <- schemes_somval_1 %>% st_make_valid() %>% st_buffer(10)
+schemes_somval_2 <- schemes_somval_2 %>% st_make_valid() %>% st_buffer(10)
+schemes_banes <- schemes_banes %>% st_make_valid() %>% st_buffer(10)
+schemes_nsc <- schemes_nsc %>% st_make_valid() %>% st_buffer(10)
+schemes_sgc <- schemes_sgc %>% st_make_valid() %>% st_buffer(10)
+
+
+
+schemes_all <- rbind(schemes_bcc, schemes_somval_1, schemes_somval_2,
+                     schemes_sgc, schemes_banes)
+
+
+
+hotspots <- st_read(choose.files())
 
 ### To Do : -> -> -> -> 
 ###        segment by length
@@ -32,10 +70,10 @@ bright <- khroma::color("bright")
 bright_pal <- bright(6)[1:6]
 
 #speed palette
-prgn <- khroma::color("PRGn")
-prgn(6)[6:1]
-khroma::plot_scheme(prgn(6))
-khroma::plot_scheme_colourblind(prgn(6))
+# prgn <- khroma::color("PRGn")
+# prgn(6)[6:1]
+# khroma::plot_scheme(prgn(6))
+# khroma::plot_scheme_colourblind(prgn(6))
 
 # burg <- unname(
 #   as.character(
@@ -43,10 +81,10 @@ khroma::plot_scheme_colourblind(prgn(6))
 #   )
 # )
 
-pal_speed <- colorNumeric(palette = incandescent(6)[6:1], domain = 0:12)
+# pal_speed <- colorNumeric(palette = incandescent(6)[6:1], domain = 0:12)
 #pal_iqr <- colorNumeric(palette = burg, domain = 0:8)
 #pal_sd <- colorNumeric(palette = burg, domain = 0:5)
-pal_speed_div <- colorNumeric(palette = prgn(6)[6:1], domain = -2:2)
+# pal_speed_div <- colorNumeric(palette = prgn(6)[6:1], domain = -2:2)
 
 
 
@@ -74,7 +112,7 @@ for (i in seq_along(pings_seg_both_dir_all)) {
 }
 
 # Specify files to exclude
-exclude <- c( 6)
+exclude <- c( 8)
 
 # Remove them
 pings_seg_both_dir_all <- pings_seg_both_dir_all[-exclude]
