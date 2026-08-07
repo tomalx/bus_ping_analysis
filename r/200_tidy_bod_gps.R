@@ -23,7 +23,10 @@ rm(bod_loc_query) # don't need this anymore?
 # filter services that have same route number (6 in Bath, 6 in Bristol etc)
 bod_eg$ticketMachineServiceCode %>% unique()
 unique_service_code <- bod_eg$ticketMachineServiceCode %>% unique() 
-unique_service_code <- unique_service_code[2] 
+
+##  <<<< SELECT CORRECT ROUTE HERE >>>>
+      unique_service_code <- unique_service_code[1] ##  <<<< SELECT CORRECT ROUTE HERE >>>>
+##  <<<< SELECT CORRECT ROUTE HERE >>>>
 
 # filter for e.g. m1 inbound
 bod_eg <- bod_eg %>%

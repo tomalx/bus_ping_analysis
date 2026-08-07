@@ -7,6 +7,11 @@ in_out_lookup <- stop_seq %>%     # BOD pings use inbound/outbound, whereas
   dplyr::select(stop_code, direction_id)
 
 
+# in_out_lookup <- tibble(stop_code = c("0180BAC30561", "0180BAC30609"),
+#                         direction_id = c(1,0))    ### OONLY use when manual intervention required,
+                                                    ### stop_code should match originRef in bod_eg
+
+
 
 # snap points function
 

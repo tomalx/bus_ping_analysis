@@ -12,7 +12,9 @@ schemes_nsc <- st_read(choose.files())
 schemes_sgc <- st_read(choose.files())
 
 schemes <- list(schemes_bcc, schemes_somval_1, schemes_somval_2,
-                schemes_banes, schemes_nsc, schemes_sgc)
+                schemes_banes, 
+                #schemes_nsc, 
+                schemes_sgc)
 
 names(schemes_bcc) <- tolower(names(schemes_bcc))
 names(schemes_somval_1) <- tolower(names(schemes_somval_1))
@@ -59,7 +61,7 @@ hotspots <- st_read(choose.files())
 # seg_sd_speed <- pings_seg_both_dir %>%
 #   slice_max(speed_sd,n = 20)
 
-top_n <- 20
+top_n <- 50
 
 #speed palette
 incandescent <- khroma::color("incandescent")
@@ -150,7 +152,7 @@ map <- leaflet() %>%
   
   # slowest
   map <- map %>%  addArrowhead(data = pings_seg_both_dir_all %>% 
-                  slice_min(speed_50, n = 20), 
+                  slice_min(speed_50, n = top_n), 
                 # filter(direction_id == 0),  
                color = bright_pal[1], opacity = 1,
                weight = 5,
@@ -177,7 +179,7 @@ map <- leaflet() %>%
   
   # variance
   map <- map %>%  addArrowhead(data = pings_seg_both_dir_all %>% 
-                                 slice_max(speed_sd, n = 20), 
+                                 slice_max(speed_sd, n = top_n), 
                                # filter(direction_id == 0),  
                                color = bright_pal[2], opacity = 1,
                                weight = 5,
@@ -208,7 +210,7 @@ map <- leaflet() %>%
   
   # peak - off peak difference
   map <- map %>%  addArrowhead(data = pings_seg_both_dir_all %>% 
-                                 slice_max(speed_am_v_qck, n = 20), 
+                                 slice_max(speed_am_v_qck, n = top_n), 
                                # filter(direction_id == 0),  
                                color = bright_pal[3], opacity = 1,
                                weight = 5,
@@ -236,7 +238,7 @@ map <- leaflet() %>%
   
   # peak - off peak difference
   map <- map %>%  addArrowhead(data = pings_seg_both_dir_all %>% 
-                                 slice_max(speed_pm_v_qck, n = 20), 
+                                 slice_max(speed_pm_v_qck, n = top_n), 
                                # filter(direction_id == 0),  
                                color = bright_pal[4], opacity = 1,
                                weight = 5,
@@ -324,8 +326,10 @@ map <- leaflet() %>%
 #                           color = "#444",
 #                           group = "northbound stops")
 
-map <- map %>% addPolygons(data = schemes %>% filter(intervention_type == "area"), color = "#555555", weight = NA, popup = ~name, group = "schemes")
-map <- map %>% addPolylines(data = schemes %>% filter(intervention_type == "route"),  color = "#555555", popup = ~name, group = "schemes")
+map <- map %>% addPolygons(data = schemes_all %>% filter(intervention_type == "area"), color = "#555555", weight = NA, popup = ~name, group = "schemes")
+map <- map %>% addPolylines(data = schemes_all %>% filter(intervention_type == "route"),  color = "#555555", popup = ~name, group = "schemes")
+
+map <- map %>% addPolygons(data = schemes_all , color = "#555555", weight = NA, popup = ~name, group = "schemes")
 
 map <- map  %>% addGroupedLayersControl(
       overlayGroups = list(

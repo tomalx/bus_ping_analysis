@@ -24,8 +24,8 @@ library(scales)
 # top_n <- 20
 
 #speed palette
-# incandescent <- khroma::color("incandescent")
-# incandescent(6)[6:1]
+ incandescent <- khroma::color("incandescent")
+ incandescent(6)[6:1]
 
 #speed palette
 prgn <- khroma::color("PRGn")
@@ -43,13 +43,18 @@ prgn(6)[6:1]
 #pal_iqr <- colorNumeric(palette = burg, domain = 0:8)
 #pal_sd <- colorNumeric(palette = burg, domain = 0:5)
 pal_speed_div <- colorNumeric(palette = prgn(6)[6:1], domain = -3:3)
+pal_speed_div <- colorNumeric(palette = incandescent(6)[1:6], domain = -3:3)
 
 
 
 pings_seg_both_dir <- pings_seg_both_dir %>% 
   mutate(speed_sd_scaled = rescale(speed_sd, to = c(2,10))) %>% 
   mutate(speed_am_off_diff = speed_early_late - speed_am_peak) %>% 
-  mutate(speed_am_off_diff_cap = pmin(speed_am_off_diff, 3))
+  mutate(speed_pm_off_diff = speed_early_late - speed_pm_peak) %>% 
+  mutate(speed_am_off_diff_cap = pmin(speed_am_off_diff, 3)) %>% 
+  mutate(speed_pm_off_diff_cap = pmin(speed_pm_off_diff, 3)) %>% 
+  mutate(speed_am_off_diff_cap = pmax(speed_am_off_diff_cap, -3)) %>% 
+  mutate(speed_pm_off_diff_cap = pmax(speed_pm_off_diff_cap, -3))
   
   #mutate(speed_50_scaled = rescale(speed_50, to = c(0,15)))
 
@@ -66,8 +71,10 @@ map <- leaflet() %>%
                popup = ~paste0("<b>",htmlEscape(seg_name),"</b>","<br>",
                                "average speed (all day): ", htmlEscape(round(speed_50,2)),"m/s","<br>",
                                "am peak average speed: ", htmlEscape(round(speed_am_peak,2)),"m/s","<br>",
+                               "pm peak average speed: ", htmlEscape(round(speed_pm_peak,2)),"m/s","<br>",
                                "early/late average speed: ", htmlEscape(round(speed_early_late,2)),"m/s","<br>",
-                               "difference (early/late minus am peak): ", htmlEscape(round(speed_am_off_diff,2)),"m/s"),
+                               "difference (early/late minus am peak): ", htmlEscape(round(speed_am_off_diff,2)),"m/s","<br>",
+                               "difference (early/late minus pm peak): ", htmlEscape(round(speed_pm_off_diff,2)),"m/s"),
                options = arrowheadOptions(
                  yawn = 60,
                  size = "20px",
@@ -86,8 +93,11 @@ map <- leaflet() %>%
                                popup = ~paste0("<b>",htmlEscape(seg_name),"</b>","<br>",
                                                "average speed (all day): ", htmlEscape(round(speed_50,2)),"m/s","<br>",
                                                "am peak average speed: ", htmlEscape(round(speed_am_peak,2)),"m/s","<br>",
+                                               "pm peak average speed: ", htmlEscape(round(speed_pm_peak,2)),"m/s","<br>",
                                                "early/late average speed: ", htmlEscape(round(speed_early_late,2)),"m/s","<br>",
-                                               "difference (early/late minus am peak): ", htmlEscape(round(speed_am_off_diff,2)),"m/s"),
+                                               "difference (early/late minus am peak): ", htmlEscape(round(speed_am_off_diff,2)),"m/s","<br>",
+                                               "difference (early/late minus pm peak): ", htmlEscape(round(speed_pm_off_diff,2)),"m/s"),
+                               
                                options = arrowheadOptions(
                                  yawn = 60,
                                  size = "20px",

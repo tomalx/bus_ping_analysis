@@ -39,6 +39,13 @@ route_split_1 <- split_every_x_metres(
   longest_stop_seq = longest_stop_seq
 )  
 
+route_split_0 <- split_every_x_metres(
+  dir = 0,
+  routes = dc_routes,
+  dist = seg_size,
+  longest_stop_seq = longest_stop_seq
+)  
+
 
 # breaks by stop to stop distance - USE WITH SPLIT AT STOP
 seg_break_0 <- stops_0$dist_m
@@ -215,6 +222,7 @@ pings_seg_both_dir <- pings_seg_both_dir %>%
   mutate(route_id = route_id_filtered)
 
 saveRDS(pings_seg_both_dir, file = paste0("rds/pings_seg_both_dir_",route_number,"_",route_id_filtered,".rds"))
+saveRDS(pings_seg_both_dir, file = paste0("rds/pings_seg_100m_",route_number,"_",route_id_filtered,".rds"))
 
 ##########################
 
